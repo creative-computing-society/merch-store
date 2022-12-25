@@ -1,0 +1,9 @@
+services:
+  merch-store:
+    image: ccs/merch-store
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports: "3376:3376"
+    volumes:
+      - ./static/:/app/static/
