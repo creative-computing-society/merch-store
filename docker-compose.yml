@@ -10,3 +10,4 @@ services:
       - "3376:3376"
     volumes:
       - ./static/:/app/static/
+      - ./logs/:/app/logs/
