@@ -1,5 +1,7 @@
+version: '3'
+
 services:
-  merch-store:
+  merchstoreapi:
     image: ccs/merch-store
     build:
       context: .
