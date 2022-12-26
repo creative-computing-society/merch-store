@@ -6,6 +6,7 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
-    ports: "3376:3376"
+    ports: 
+      - "3376:3376"
     volumes:
       - ./static/:/app/static/
