@@ -6,6 +6,8 @@ from rest_framework.permissions import IsAuthenticated
 
 from django.contrib.auth import authenticate
 
+from .serializers import UserSerializer
+
 # Create your views here.
 
 
@@ -52,3 +54,12 @@ class LogoutView(APIView):
         token = Token.objects.get(user=request.user)
         token.delete()
         return Response(status=status.HTTP_200_OK)
+
+
+class UserDetails(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        serializer = UserSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
