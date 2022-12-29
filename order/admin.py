@@ -8,7 +8,7 @@ class OrderAdmin(admin.ModelAdmin):
     search_fields = ('id', 'user_email')
 
     def items_count(self, obj):
-        return (obj.products.count())
+        return (obj.order_items.count())
 
 
 class OrderItemAdmin(admin.ModelAdmin):
