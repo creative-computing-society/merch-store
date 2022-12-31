@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Log In | CCS Merchandise Store</title>
+  <link rel="icon" type="image/x-icon" href="{% static 'dashboard/img/CCSLOGO.jpg' %}">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+</head>
+
+<body style="background-color: #6495ed;">
+
+  <div class="container my-5">
+    <div class="row justify-content-center">
+      <form class="card col-10 col-md-8 col-lg-6 col-xl-4" action="{{ app_path }}" method="POST">
+        {% csrf_token %}
+        <div class="card-body">
+          <h3 class="card-title text-center mt-3 mb-5">Sign in</h3>
+
+          <div class="mb-4">
+            <label class="form-label" for="id_username">Email</label>
+            <input name="username" maxlength="254" id="id_username" type="email" class="form-control" required />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" for="id_password">Password</label>
+            <input name="password" type="password" id="id_password" class="form-control" required />
+          </div>
+          {% if form.errors %}
+          <p class="card-text text-center" style="color:#ff0600;">Invalid credentials</p>
+          {% endif %}
+          <button type="submit" class="btn btn-primary w-100 my-3" type="submit">Login</button>
+
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+
+</html>
