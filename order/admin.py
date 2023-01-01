@@ -1,7 +1,7 @@
 from django.contrib import admin
 from import_export.resources import ModelResource
 from import_export.admin import ExportMixin
-from .models import Order, OrderItem
+from .models import Order, OrderItem, PendingEmail
 
 # Register your models here.
 
@@ -22,7 +22,6 @@ class OrderAdmin(ExportMixin, admin.ModelAdmin):
         return (obj.order_items.count())
 
 
-
 class OrderItemResource(ModelResource):
     class Meta:
         model = OrderItem
@@ -33,5 +32,12 @@ class OrderItemAdmin(ExportMixin, admin.ModelAdmin):
     list_display = ('id', 'order', 'product', 'printing_name', 'size')
     search_fields = ('product__name', 'order__id', 'order__user__email')
 
+
+class PendingEmailAdmin(admin.ModelAdmin):
+    list_display = ('order', )
+    search_fields = ('order', )
+
+
 admin.site.register(Order, OrderAdmin)
 admin.site.register(OrderItem, OrderItemAdmin)
+admin.site.register(PendingEmail, PendingEmailAdmin)

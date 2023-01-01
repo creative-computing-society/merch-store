@@ -65,7 +65,7 @@ class initiateOrder(APIView):
 
 def generateOrderId():
     flag = "".join(random.choice(string.ascii_letters) for _ in range(6))
-    time = datetime.now().strftime('%Y%m%d_%H%M%S')
+    time = datetime.now().strftime('%Y%m%d%H%M%S')
     return f"ccs_{time}_{flag}"
 
 class placeOrder(APIView):
@@ -75,6 +75,9 @@ class placeOrder(APIView):
         user = request.user
 
         screenshot = request.data.get('screenshot')
+
+        if screenshot is None:
+            return Response({'error': 'Screenshot file missing'}, status=status.HTTP_400_BAD_REQUEST)
 
         if screenshot.name.split('.')[-1] not in allowed_extensions:
             return Response({'error': 'Invalid file type. Allowed file types are png, jpg and heic'}, status=status.HTTP_400_BAD_REQUEST)
