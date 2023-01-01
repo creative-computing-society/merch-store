@@ -127,8 +127,8 @@ Your password for CCS Merchandise Store(https://merch.ccstiet.com) is {password}
 Regards
 Team CCS Merchandise Store
 """
-        email = EmailMessage(email_subject, email_body, settings.EMAIL_HOST_USER, [row[1]])
-        connection.send_messages([email])
+        email = EmailMessage(email_subject, email_body, settings.EMAIL_HOST_USER, (row[1],), reply_to=('ccs@thapar.edu',))
+        connection.send_messages((email,))
     userfile.close()
     passwordfile.close()
     connection.close()

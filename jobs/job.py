@@ -24,8 +24,8 @@ Total amount paid: Rs.{order.amount}
 
 Regards
 Team CCS Merchandise Store"""
-            email = mail.EmailMessage(success_subject, body, settings.EMAIL_HOST_USER, [user.email], connection=connection)
-            connection.send_messages([email])
+            email = mail.EmailMessage(success_subject, body, settings.EMAIL_HOST_USER, (user.email,), connection=connection, reply_to=('ccs@thapar.edu',))
+            connection.send_messages((email,))
         else:
             body = f"""Hello {user.name}
 
@@ -34,7 +34,7 @@ You can re-order your purchase with a valid screenshot of the payment of the req
 
 Regards
 Team CCS Merchandise Store"""
-            email = mail.EmailMessage(failure_subject, body, settings.EMAIL_HOST_USER, [user.email], connection=connection)
-            connection.send_messages([email])
+            email = mail.EmailMessage(failure_subject, body, settings.EMAIL_HOST_USER, (user.email,), connection=connection, reply_to=('ccs@thapar.edu',))
+            connection.send_messages((email,))
         item.delete()
     connection.close()
