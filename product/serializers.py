@@ -10,7 +10,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def get_status(self, obj):
         user  = self.context.get('user')
-        if user is None:
+        if user is None or user.is_anonymous:
             return ""
         if not obj.accept_orders:
             return "forbidden"
