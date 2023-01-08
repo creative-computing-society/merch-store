@@ -38,7 +38,7 @@ class Order(models.Model):
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_items')
-    product = models.ForeignKey(Product, null=True, on_delete=models.SET_NULL, related_name='order_items')
+    product = models.ForeignKey(Product, null=True, on_delete=models.CASCADE, related_name='order_items')
 
     printing_name = models.CharField(max_length=100, null=True, blank=True, default=None)
     size = models.CharField(max_length=5, null=True, blank=True, default=None)
