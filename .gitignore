@@ -57,3 +57,5 @@ cert.pem
 
 #error logs
 logs
+
+jobs.sqlite
