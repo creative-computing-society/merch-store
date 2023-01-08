@@ -3,9 +3,11 @@ from django.http import Http404, StreamingHttpResponse, HttpResponseBadRequest, 
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.files.storage import default_storage
 from django.views.decorators.http import require_POST
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMessage, EmailMultiAlternatives
 from django.core import mail
 from django.conf import settings
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 
 from order.models import Order, OrderItem
 from product.models import Product
@@ -120,14 +122,15 @@ def importUsers(request):
             passwordfile.close()
             connection.close()
             return HttpResponse(f"error in {row[0]}, {row[1]}. All previous entries created successfully.")
-        email_body = f"""Hello {row[0]}
-
-Your password for CCS Merchandise Store(https://merch.ccstiet.com) is {password}
-
-Regards
-Team CCS Merchandise Store
-"""
-        email = EmailMessage(email_subject, email_body, settings.EMAIL_HOST_USER, (row[1],), reply_to=('ccs@thapar.edu',))
+        context = {
+            'name': row[0],
+            'email': row[1],
+            'password': password
+        }
+        html_message = render_to_string('dashboard/email_login_credentials.html', context)
+        msg = strip_tags(html_message)
+        email = EmailMultiAlternatives(email_subject, msg, settings.EMAIL_HOST_USER, (row[1],), reply_to=('ccs@thapar.edu',))
+        email.attach_alternative(html_message, 'text/html')
         connection.send_messages((email,))
     userfile.close()
     passwordfile.close()
