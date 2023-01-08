@@ -18,6 +18,8 @@ class Product(models.Model):
 
     image_url1 = models.URLField(max_length=5000, null=True, default=None)
     image_url2 = models.URLField(max_length=5000, null=True, default=None)
+
+    size_chart_url = models.URLField(max_length=5000, null=True, default=None)
     
     def __str__(self):
         return self.name
