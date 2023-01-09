@@ -4,15 +4,13 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
 from django.conf import settings
-from django.http import HttpResponse, HttpResponseNotFound, HttpResponseServerError
-from django.shortcuts import render
 
 from .models import Order,OrderItem
 from product.models import CartItem
 from .serializers import OrderSerializer
 
 from datetime import datetime
-import string, random, os
+import string, random
 
 allowed_extensions = ['jpg', 'jpeg', 'jfif', 'pjpeg', 'pjp', 'png', 'heic']
 
@@ -51,7 +49,10 @@ class initiateOrder(APIView):
         amount = 0.00
 
         for item in cart_items:
-            amount += float(item.product.price)
+            if item.product.accept_orders==False or item.product.is_visible==False:
+                item.delete()
+            else:
+                amount += float(item.product.price)
         
         data = {
             'amount': amount,
@@ -100,7 +101,7 @@ class placeOrder(APIView):
 
         for item in cart_items:
             amount += float(item.product.price)
-            order_item = OrderItem(order=order, product=item.product, printing_name=item.printing_name, size=item.size)
+            order_item = OrderItem(order=order, product=item.product, printing_name=item.printing_name, size=item.size, image_url=item.image_url)
             order_item.save()
         
         order.amount = str(amount)

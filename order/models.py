@@ -34,6 +34,10 @@ class Order(models.Model):
                     if not CartItem.objects.filter(user=self.user, product=item.product).exists():
                         cart_item = CartItem(user=self.user, product=item.product, printing_name=item.printing_name, size=item.size)
                         cart_item.save()
+    
+    def delete(self, *args, **kwargs):
+        self.screenshot.delete()
+        super().delete(*args, **kwargs)
 
 
 class OrderItem(models.Model):
@@ -42,6 +46,7 @@ class OrderItem(models.Model):
 
     printing_name = models.CharField(max_length=100, null=True, blank=True, default=None)
     size = models.CharField(max_length=5, null=True, blank=True, default=None)
+    image_url = models.URLField(max_length=5000, null=True, blank=True, default=None)
 
     def __str__(self):
         return f"{self.order.id }_{self.product.name}"

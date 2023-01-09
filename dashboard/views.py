@@ -74,6 +74,8 @@ def ordersCSV(request, id):
         first_row.append('Size')
     if product.is_name_required:
         first_row.append('Printing Name')
+    if product.is_image_required:
+        first_row.append('Image URL')
     rows.append(first_row)
     for item in order_items:
         user = item.order.user
@@ -82,6 +84,8 @@ def ordersCSV(request, id):
             row.append(item.size)
         if product.is_name_required:
             row.append(item.printing_name)
+        if product.is_image_required:
+            row.append(item.image_url)
         rows.append(row)
     psudo_buffers = Echo()
     writer = csv.writer(psudo_buffers)

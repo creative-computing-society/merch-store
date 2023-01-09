@@ -15,9 +15,9 @@ class AllProductsView(APIView):
     def get(self, request):
         user = request.user
         if user.is_anonymous:
-            queryset = Product.objects.all()
+            queryset = Product.objects.filter(is_visible=True).all()
         else:
-            queryset = Product.objects.filter(for_user_positions__contains=[user.position])
+            queryset = Product.objects.filter(for_user_positions__contains=[user.position], is_visible=True)
         serializer = ProductSerializer(queryset, many=True, context={'user': user})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -27,7 +27,7 @@ class ProductView(APIView):
     def get(self, request, product_id):
         user = request.user
         product = Product.objects.filter(id=product_id).first()
-        if product is None or user.is_authenticated and user.position not in product.for_user_positions:
+        if product is None or user.is_authenticated and user.position not in product.for_user_positions or product.is_visible == False:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         serializer = ProductSerializer(product, context={'user': user})
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -40,13 +40,14 @@ class AddToCart(APIView):
         product_id = request.data.get('product_id')
         product = Product.objects.filter(id=product_id).first()
         user = request.user
-        if product is None or user.position not in product.for_user_positions or CartItem.objects.filter(user=user, product=product).exists() or OrderItem.objects.filter(product=product, order__user=user).exclude(order__is_verified=False).exists():
+        if product is None or user.position not in product.for_user_positions or CartItem.objects.filter(user=user, product=product).exists() or OrderItem.objects.filter(product=product, order__user=user).exclude(order__is_verified=False).exists() or product.is_visible == False or product.accept_orders == False:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         printing_name = request.data.get('printing_name')
         size = request.data.get('size')
-        if product.is_name_required and printing_name is None or product.is_size_required and size is None:
+        image_url = request.data.get('image_url')
+        if product.is_name_required and printing_name is None or product.is_size_required and size is None or product.is_image_required and image_url is None:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        cart_item = CartItem(product=product, user=user, printing_name=printing_name, size=size)
+        cart_item = CartItem(product=product, user=user, printing_name=printing_name, size=size, image_url=image_url)
         cart_item.save()
         return Response(status=status.HTTP_200_OK)
 

@@ -8,7 +8,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OrderItem
-        fields = ['product', 'printing_name', 'size']
+        fields = ['product', 'printing_name', 'size', 'image_url']
 
 
 class OrderSerializer(serializers.ModelSerializer):

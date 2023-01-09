@@ -20,7 +20,7 @@ class ProductSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'price', 'is_name_required', 'is_size_required', 'image_url1', 'image_url2', 'status', 'size_chart_url']
+        fields = ['id', 'name', 'description', 'price', 'is_name_required', 'is_size_required', 'is_image_required', 'image_url1', 'image_url2', 'status', 'size_chart_url']
 
 
 class CartItemSerializer(serializers.ModelSerializer):
@@ -28,4 +28,4 @@ class CartItemSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = CartItem
-        fields = ['id', 'product', 'printing_name', 'size']
+        fields = ['id', 'product', 'printing_name', 'size', 'image_url']

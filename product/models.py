@@ -10,8 +10,9 @@ class Product(models.Model):
     
     is_name_required = models.BooleanField(default=False)
     is_size_required = models.BooleanField(default=False)
+    is_image_required = models.BooleanField(default=False)
     accept_orders = models.BooleanField(default=True)
-    
+    is_visible = models.BooleanField(default=True)
     description = models.TextField(null=True, blank=True, default=None)
     
     for_user_positions = ArrayField(base_field=models.CharField(max_length=2), size=4, default=list, help_text="comma separated list: MB - member, CR - Core, JS - Joint Sec, GS - Gen Sec. Ex: GS,JS,CR")
@@ -32,7 +33,7 @@ class CartItem(models.Model):
 
     printing_name = models.CharField(max_length=100, null=True, blank=True, default=None)
     size =  models.CharField(max_length=5, null=True, blank=True, default=None)
-
+    image_url = models.URLField(max_length=5000, null=True, blank=True, default=None)
+    
     def __str__(self):
         return f"{self.user.email}_{self.product.name}"
-    

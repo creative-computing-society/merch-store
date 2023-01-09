@@ -29,7 +29,7 @@ class OrderItemResource(ModelResource):
 class OrderItemAdmin(ExportMixin, admin.ModelAdmin):
     resource_class = OrderItemResource
 
-    list_display = ('id', 'order', 'product', 'printing_name', 'size')
+    list_display = ('id', 'order', 'product', 'printing_name', 'size', 'image_url')
     search_fields = ('product__name', 'order__id', 'order__user__email')
 
 
