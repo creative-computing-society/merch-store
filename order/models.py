@@ -34,10 +34,6 @@ class Order(models.Model):
                     if not CartItem.objects.filter(user=self.user, product=item.product).exists():
                         cart_item = CartItem(user=self.user, product=item.product, printing_name=item.printing_name, size=item.size)
                         cart_item.save()
-    
-    def delete(self, *args, **kwargs):
-        self.screenshot.delete()
-        super().delete(*args, **kwargs)
 
 
 class OrderItem(models.Model):
