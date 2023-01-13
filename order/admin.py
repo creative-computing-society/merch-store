@@ -13,7 +13,7 @@ class OrderAdmin(ExportMixin, admin.ModelAdmin):
     resource_class = OrderResource
 
     list_display = ('id', 'user', 'amount', 'screenshot', 'is_verified')
-    search_fields = ('id', 'user_email')
+    search_fields = ('id', 'user__email')
     list_filter = ('is_verified', )
     list_editable = ('is_verified', )
     exclude = ('cart_restored', )
