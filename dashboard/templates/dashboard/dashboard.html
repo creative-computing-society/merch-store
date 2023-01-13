@@ -15,6 +15,15 @@
 </head>
 <body>
 <div class="container">
+    <div class="row my-3">
+        <div class="col">
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-info">{{message}}</div>
+            {% endfor %}
+            {% endif %}
+        </div>
+    </div>
     <div class="row">
         <div class="col-md-4 col-xl-3">
             <div class="card bg-c-blue order-card">
@@ -51,9 +60,15 @@
                 </div>
             </div>
         </div>
-
 	</div>
 
+    <div class="row my-3">
+        <form class="col" action="{% url 'stopOrders' %}" method="POST">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">Stop Accepting Orders</button>
+        </form>
+    </div>
+    
 
     <div class="row align-items-center">
         <div class="col-md-6">
@@ -95,12 +110,16 @@
             </div>
         </div>
     </div>
+
+    <div class="row my-3">
+        <div class="col">
+            <a href="/media/passwords.csv" target="_blank">Previous generated Passwords</a>
+        </div>
+    </div>
+
     <div class="row align-items-center my-4">
         <div class="col">
             <h1 class="h4">Import users </h1>
-        </div>
-        <div class="col">
-            <a href="/media/passwords.csv" target="_blank">Previous generated Passwords</a>
         </div>
         <div class="col-12">
             <form action="{% url 'importUsers' %}" method="POST" enctype="multipart/form-data">

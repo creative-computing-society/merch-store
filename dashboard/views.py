@@ -1,16 +1,17 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import Http404, StreamingHttpResponse, HttpResponseBadRequest, FileResponse, HttpResponse
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.files.storage import default_storage
 from django.views.decorators.http import require_POST
-from django.core.mail import EmailMessage, EmailMultiAlternatives
+from django.core.mail import EmailMultiAlternatives
 from django.core import mail
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
+from django.contrib import messages
 
 from order.models import Order, OrderItem
-from product.models import Product
+from product.models import Product, CartItem
 from login.models import User
 
 import csv, string, random, os
@@ -140,3 +141,16 @@ def importUsers(request):
     passwordfile.close()
     connection.close()
     return FileResponse(open(passwordfile_path, 'rb'))
+
+
+@require_POST
+def stopOrders(request):
+    products = Product.objects.all()
+    for product in products:
+        product.accept_orders = False
+        product.save()
+    cart_items = CartItem.objects.all()
+    for cart_item in cart_items:
+        cart_item.delete()
+    messages.success(request, 'Stopped receiving orders and cleared all carts')
+    return redirect('/dashboard')
