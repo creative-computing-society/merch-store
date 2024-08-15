@@ -16,4 +16,5 @@ backend/logs
 #vs code files
 *.vscode
 __pycache__
+migrations
 *.pyc
