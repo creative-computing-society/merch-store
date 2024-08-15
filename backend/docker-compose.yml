@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+  api:
+    build: .
+    command: >
+      sh -c "
+      python /app/backend/manage.py collectstatic --noinput &&
+      python /app/backend/manage.py migrate &&
+      gunicorn --chdir /app/backend backend.wsgi:application --bind 0.0.0.0:3376
+      "
+    volumes:
+      - .:/app
+      - ./backend/logs/:/app/logs/
+      - ./backend/media/:/app/media/
+      - ./static/:/app/static/
+    ports:
+      - "3377:3376"
+    depends_on:
+      - db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+volumes:
+  postgres_data:

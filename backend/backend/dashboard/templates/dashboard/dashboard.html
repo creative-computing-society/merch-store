@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'dashboard/css/dashboard.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/boxicons/2.1.0/css/boxicons.min.css"
+        integrity="sha512-pVCM5+SN2+qwj36KonHToF2p1oIvoU3bsqxphdOIWMYmgr4ZqD3t5DjKvvetKhXGc/ZG5REYTT6ltKfExEei/Q=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/MaterialDesign-Webfont/5.3.45/css/materialdesignicons.css"
+        integrity="sha256-NAxhqDvtY0l4xn+YVa6WjAcmd94NNfttjNsDmNatFVc=" crossorigin="anonymous" />
+    <link rel="icon" type="image/x-icon" href="{% static 'dashboard/img/CCSLOGO.jpg' %}">
+    <title>Dashboard | CCS Merchandise Store</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row my-3">
+            <div class="col">
+                {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-info">{{message}}</div>
+                {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 col-xl-3">
+                <div class="card bg-c-blue order-card">
+                    <div class="card-block">
+                        <h6 class="m-b-20">Amount Received</h6>
+                        <h2 class="text-right"><i class="fa fa-rocket f-left"></i><span>{{amount_received}}</span>
+                        </h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-xl-3">
+                <div class="card bg-c-green order-card">
+                    <div class="card-block">
+                        <h6 class="m-b-20">Total Items Ordered</h6>
+                        <h2 class="text-right"><i class="fa fa-user-plus f-left"></i><span>{{items_ordered}}</span>
+                        </h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-xl-3">
+                <div class="card bg-c-yellow order-card">
+                    <div class="card-block">
+                        <h6 class="m-b-20">Unsuccessful Payments</h6>
+                        <h2 class="text-right"><i
+                                class="fa fa-times-circle-o f-left"></i><span>{{unsuccessful_orders}}</span></h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-xl-3">
+                <div class="card bg-c-pink order-card">
+                    <div class="card-block">
+                        <h6 class="m-b-20">Pending Payments</h6>
+                        <h2 class="text-right"><i class="fa fa-clock-o f-left"></i><span>{{pending_orders}}</span>
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col">
+                <a href="/products" class="btn btn-primary">Manage Products</a>
+                <a href="/discount-codes" class="btn btn-primary">Manage Discount Codes</a>
+                <form class="d-inline" action="{% url 'start_orders' %}" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success">Start Accepting Orders</button>
+                </form>
+                <form class="d-inline" action="{% url 'stop_orders' %}" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Stop Accepting Orders</button>
+                </form>
+                <a href="/scan_qr" class="btn btn-warning">Scan QR Codes</a>
+            </div>
+        </div>
+
+
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <h5 class="card-title">Products Information <span
+                            class="text-muted fw-normal ms-2">&nbsp;({{productsCount}})</span></h5>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="table-responsive">
+                    <table class="table project-list-table table-nowrap align-middle table-borderless">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Orders Received</th>
+                                <th scope="col">Quantity Count</th>
+                                <th scope="col">Price</th>
+                                <th scope="col">CSV file</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                            <tr>
+                                <td>{{forloop.counter}}</td>
+                                <td>{{item.name}} (ID: {{item.id}})</td>
+                                <td>{{item.orders_count}}</td>
+                                <td>{{item.quantity}}</td>
+                                <td>{{item.price}}</td>
+                                <td>
+                                    <form action="{% url 'export_csv' item.id %}" method="POST">
+                                        {% csrf_token %}
+                                        {% if item.orders_count > 0 %}
+                                        <button type="submit" class="btn btn-primary">Export CSV</button>
+                                        {% else %}
+                                        <button type="submit" class="btn btn-primary" disabled>Export CSV</button>
+                                        {% endif %}
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- <div class="row align-items-center my-4">
+            <div class="col">
+                <h1 class="h4">Import users </h1>
+            </div>
+            <div class="col-12">
+                %%<form action="{ url 'import_users_from_csv' }" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="file" name="file" class="form-control mt-3" />
+                    <p>Only CSV file supported. Format: name, email, phone_no, position(MB - Member, CR - Core, JS -
+                        Joint
+                        Sec, FS - Fin Sec, GS - Gen Sec).</p>
+                    <button type="submit" class="btn btn-primary mt-3">Submit</button>
+                </form>
+            </div>
+        </div> -->
+    </div>
+
+</body>
+
+</html>

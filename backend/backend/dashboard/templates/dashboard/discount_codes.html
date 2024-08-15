@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'dashboard/css/dashboard.css' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'dashboard/img/CCSLOGO.jpg' %}">
+    <title>Discount Codes | CCS Merchandise Store</title>
+</head>
+
+<body>
+    <div class="container mt-5">
+        <div class="row my-3">
+            <div class="col">
+                {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-info">{{ message }}</div>
+                {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+        <div class="row my-3">
+            <div class="col">
+                <h1 class="mb-4">Discount Codes</h1>
+
+                <a class="btn btn-primary" href="/dashboard">
+                    Back to Dashboard
+                </a>
+                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addDiscountModal">
+                    Add Discount Code
+                </button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th scope="col">Code</th>
+                                <th scope="col">Discount</th>
+                                <th scope="col">Max Uses</th>
+                                <th scope="col">Current Uses</th>
+                                <th scope="col">Expiration Date</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for code in discount_codes %}
+                            <tr>
+                                <td>{{ code.code }}</td>
+                                <td>{{ code.discount_percentage }}</td>
+                                <td>{{ code.max_uses }}</td>
+                                <td>{{ code.uses }}</td>
+                                <td>{{ code.expiry_date }}</td>
+                                <td>
+                                    <button type="button" class="btn btn-warning" data-toggle="modal"
+                                        data-target="#editDiscountModal" data-id="{{ code.id }}"
+                                        data-code="{{ code.code }}"
+                                        data-discount_percentage="{{ code.discount_percentage }}"
+                                        data-for_user_positions="{{code.for_user_positions.0}}"
+                                        data-max_uses="{{ code.max_uses }}"
+                                        data-expiry_date="{{ code.expiry_date|date:'Y-m-d\\TH:i' }}"
+                                        data-uses="{{ code.uses }}" data-custom="{{ code.custom }}">
+                                        Edit
+                                    </button>
+                                    <a onclick="return confirm('Are you sure you want to delete Discount Code: {{ code.code }}?')"
+                                        href="{% url 'delete_discount_code' code.id %}"
+                                        class="btn btn-danger">Delete</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Discount Modal -->
+    <div class="modal fade" id="addDiscountModal" tabindex="-1" role="dialog" aria-labelledby="addDiscountModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addDiscountModalLabel">Create Discount Code</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="{% url 'create_discount_code' %}" method="POST">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="custom">Custom Code?</label>
+                            <input type="checkbox" class="form-control" id="custom" name="custom">
+                        </div>
+                        <div class="form-group">
+                            <label for="code">Discount Code</label>
+                            <input type="text" class="form-control" id="code" name="code" disabled
+                                oninput="this.value = this.value.toUpperCase()">
+                        </div>
+                        <div class="form-group">
+                            <label for="discount_percentage">Discount Percentage</label>
+                            <input type="number" class="form-control" id="discount_percentage"
+                                name="discount_percentage" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="max_uses">Max Uses</label>
+                            <input type="number" class="form-control" id="max_uses" name="max_uses" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="for_user_positions">For User Positions</label>
+                            <select class="form-control" id="for_user_positions" name="for_user_positions" required>
+                                <option value="exbo">Executive Board Members</option>
+                                <option value="core">Core Members</option>
+                                <option value="member">Executive Members</option>
+                                <option value="user">Available to Anyone</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="expiry_date">Expiry Date</label>
+                            <input type="datetime-local" class="form-control" id="expiry_date" name="expiry_date"
+                                required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Create</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Discount Modal -->
+    <div class="modal fade" id="editDiscountModal" tabindex="-1" role="dialog" aria-labelledby="editDiscountModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editDiscountModalLabel">Edit Discount Code</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="editDiscountForm" action="{% url 'edit_discount_code' 0 %}" method="POST">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="edit_custom">Custom Code?</label>
+                            <input type="checkbox" class="form-control" id="edit_custom" name="custom" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_code">Discount Code</label>
+                            <input type="text" class="form-control" id="edit_code" name="code" readonly
+                                oninput="this.value = this.value.toUpperCase()">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_discount_percentage">Discount Percentage</label>
+                            <input type="number" class="form-control" id="edit_discount_percentage"
+                                name="discount_percentage" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_max_uses">Max Uses</label>
+                            <input type="number" class="form-control" id="edit_max_uses" name="max_uses" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_for_user_positions">For User Positions</label>
+                            <select class="form-control" id="edit_for_user_positions" name="for_user_positions"
+                                required>
+                                <option value="exbo">Executive Board Members</option>
+                                <option value="core">Core Members</option>
+                                <option value="member">Executive Members</option>
+                                <option value="user">Available to Anyone</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_expiry_date">Expiry Date</label>
+                            <input type="datetime-local" class="form-control" id="edit_expiry_date" name="expiry_date"
+                                required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Edit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.bundle.min.js"
+        crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function () {
+            $('#editDiscountModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget); // Button that triggered the modal
+                var id = button.data('id');
+                var code = button.data('code');
+                var discountPercentage = button.data('discount_percentage');
+                var maxUses = button.data('max_uses');
+                var expiryDate = button.data('expiry_date');
+                var forUserPositions = button.data('for_user_positions');
+                var custom = button.data('custom') === 'True';
+
+                var modal = $(this);
+                var form = modal.find('#editDiscountForm');
+                form.attr('action', "{% url 'edit_discount_code' 0 %}".replace('0', id));
+                modal.find('#edit_code').val(code);
+                modal.find('#edit_discount_percentage').val(discountPercentage);
+                modal.find('#edit_max_uses').val(maxUses);
+                modal.find('#edit_for_user_positions').val(forUserPositions);
+                modal.find('#edit_expiry_date').val(expiryDate);
+                modal.find('#edit_custom').prop('checked', custom);
+                modal.find('#edit_custom').val(custom ? 'on' : 'off');
+                console.log(modal.find('#edit_code').val());
+            });
+
+
+            $('#custom').change(function () {
+                var codeInput = $('#code');
+                if ($(this).is(':checked')) {
+                    codeInput.removeAttr('disabled');
+                } else {
+                    codeInput.attr('disabled', 'disabled');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

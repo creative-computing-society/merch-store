@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head><title> Register </title></head>
+    <body>
+        <h2> Register </h2>
+
+        <style>
+            h5 { color: brown;}
+        </style>
+        {% for message in messages %}
+        <h5> {{message}} </h5>
+        {% endfor %}
+
+
+        <form method="post" action="register"> 
+            {% csrf_token %}
+            <p>First name: </p>
+            <input type="text" name="fname">
+            <p>Last name: </p>
+            <input type="text" name="lname">
+            <p>Phone Number: </p>
+            <input type="number" name="mobile_num">
+            <p>Email: </p>
+            <input type="email" name="emailid">
+            <p>Password: </p>
+            <input type="password" name="password">
+            <p>Re-enter Passwrord: </p>
+            <input type="password" name="password2">
+            <br><br>
+            <input type="submit">
+        </form>
+        <br>
+        <p>already registered? :<a href="login"> Login here</a></p>
+    </body>
+</html>

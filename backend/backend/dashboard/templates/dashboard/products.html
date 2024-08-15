@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'dashboard/css/dashboard.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/boxicons/2.1.0/css/boxicons.min.css"
+        integrity="sha512-pVCM5+SN2+qwj36KonHToF2p1oIvoU3bsqxphdOIWMYmgr4ZqD3t5DjKvvetKhXGc/ZG5REYTT6ltKfExEei/Q=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/MaterialDesign-Webfont/5.3.45/css/materialdesignicons.css"
+        integrity="sha256-NAxhqDvtY0l4xn+YVa6WjAcmd94NNfttjNsDmNatFVc=" crossorigin="anonymous" />
+    <link rel="icon" type="image/x-icon" href="{% static 'dashboard/img/CCSLOGO.jpg' %}">
+    <title>Dashboard | CCS Merchandise Store</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row my-3">
+            <div class="col">
+                {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-info">{{message}}</div>
+                {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+        <div class="row my-3">
+            <div class="col">
+                <h1 class="mb-4">Products</h1>
+
+                <a class="btn btn-primary" href="/dashboard">
+                    Back to Dashboard
+                </a>
+                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addProductModal">
+                    Add Product
+                </button>
+            </div>
+        </div>
+        <div class="row my-3">
+            <div class="col">
+                <table class="table table-striped table-bordered">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Product ID</th>
+                            <th>Product Name</th>
+                            <th>Product Description</th>
+                            <th>Product Price</th>
+                            <th>Accepting Orders</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                        <tr>
+                            <td>{{product.id}}</td>
+                            <td>{{product.name}}</td>
+                            <td>{{product.description}}</td>
+                            <td>{{product.price}}</td>
+                            <td>{{product.accept_orders}}</td>
+                            <td>
+                                <button type="button" class="btn btn-warning" data-toggle="modal"
+                                    data-id="{{product.id}}" data-name="{{product.name}}"
+                                    data-description="{{product.description}}" data-price="{{product.price}}"
+                                    data-max_quantity="{{product.max_quantity}}"
+                                    data-for_user_positions="{{product.for_user_positions.0}}"
+                                    data-accept_orders="{{product.accept_orders}}"
+                                    data-is_name_required="{{product.is_name_required}}"
+                                    data-is_size_required="{{product.is_size_required}}"
+                                    data-is_image_required="{{product.is_image_required}}"
+                                    data-image1="{{product.image1}}" data-image2="{{product.image2}}"
+                                    data-size_chart_image="{{product.size_chart_image}}"
+                                    data-target="#editProductModal">
+                                    Edit
+                                </button>
+                                <a onclick="return confirm('Are you sure you want to delete Product: {{ product.name }}?')"
+                                    href="{% url 'delete_product' product.id %}" class="btn btn-danger">Delete</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Product Modal -->
+    <div class="modal fade" id="addProductModal" tabindex="-1" role="dialog" aria-labelledby="addProductModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addProductModalLabel">Add Product</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="{% url 'create_product' %}" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="name">Product Name</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Product Description</label>
+                            <input type="text" class="form-control" id="description" name="description" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="price">Product Price</label>
+                            <input type="number" class="form-control" id="price" name="price" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="max_quantity">Max quantity per user</label>
+                            <input type="number" class="form-control" id="max_quantity" name="max_quantity" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="for_user_positions">For User Positions</label>
+                            <select class="form-control" id="for_user_positions" name="for_user_positions" required>
+                                <option value="exbo">Executive Board Members</option>
+                                <option value="core">Core Members</option>
+                                <option value="member">Executive Members</option>
+                                <option value="user">Available to Anyone</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="is_name_required">Is Name Required?</label>
+                            <input type="checkbox" class="form-control" id="is_name_required" name="is_name_required">
+                        </div>
+                        <div class="form-group">
+                            <label for="is_size_required">Is Size Required?</label>
+                            <input type="checkbox" class="form-control" id="is_size_required" name="is_size_required">
+                        </div>
+                        <div class="form-group">
+                            <label for="is_image_required">Is Image Required?</label>
+                            <input type="checkbox" class="form-control" id="is_image_required" name="is_image_required">
+                        </div>
+                        <div class="form-group">
+                            <label for="accept_orders">Accept Orders</label>
+                            <input type="checkbox" class="form-control" id="accept_orders" name="accept_orders">
+                        </div>
+                        <small class="text-danger">
+                            Product images/size chart once set cannot be updated.
+                        </small>
+                        <div class="form-group">
+                            <label for="image1">Product Image URL 1</label>
+                            <input type="file" class="form-control" id="image1" name="image1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="image2">Product Image URL 2</label>
+                            <input type="file" class="form-control" id="image2" name="image2">
+                        </div>
+                        <div class="form-group">
+                            <label for="size_chart_image">Product Size Chart URL</label>
+                            <input type="file" class="form-control" id="size_chart_image" name="size_chart_image">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Product</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Product Modal -->
+    <div class="modal fade" id="editProductModal" tabindex="-1" role="dialog" aria-labelledby="editProductModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProductModalLabel">Edit Product</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="{% url 'edit_product' 0 %}" method="POST" id="editProductForm"
+                        enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="edit_name">Product Name</label>
+                            <input type="text" class="form-control" id="edit_name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_description">Product Description</label>
+                            <input type="text" class="form-control" id="edit_description" name="description" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_price">Product Price</label>
+                            <input type="number" class="form-control" id="edit_price" name="price" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_max_quantity">Max quantity per user</label>
+                            <input type="number" class="form-control" id="edit_max_quantity" name="max_quantity"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_for_user_positions">For User Positions</label>
+                            <select class="form-control" id="edit_for_user_positions" name="for_user_positions"
+                                required>
+                                <option value="exbo">Executive Board Members</option>
+                                <option value="core">Core Members</option>
+                                <option value="member">Executive Members</option>
+                                <option value="user">Available to Anyone</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_is_name_required">Is Name Required?</label>
+                            <input type="checkbox" class="form-control" id="edit_is_name_required"
+                                name="is_name_required">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_is_size_required">Is Size Required?</label>
+                            <input type="checkbox" class="form-control" id="edit_is_size_required"
+                                name="is_size_required">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_is_image_required">Is Image Required?</label>
+                            <input type="checkbox" class="form-control" id="edit_is_image_required"
+                                name="is_image_required">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_accept_orders">Accept Orders</label>
+                            <input type="checkbox" class="form-control" id="edit_accept_orders" name="accept_orders">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Edit Product</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js"></script>
+<script>
+    $('#editProductModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);
+        var id = button.data('id');
+        var name = button.data('name');
+        var description = button.data('description');
+        var price = button.data('price');
+        var max_quantity = button.data('max_quantity');
+        var for_user_positions = button.data('for_user_positions');
+        var accept_orders = button.data('accept_orders') === 'True';
+        var is_name_required = button.data('is_name_required') === 'True';
+        var is_size_required = button.data('is_size_required') === 'True';
+        var is_image_required = button.data('is_image_required') === 'True';
+
+        var modal = $(this);
+        var form = modal.find('#editProductForm');
+        form.attr('action', "{% url 'edit_product' 0 %}".replace('0', id));
+        modal.find('.modal-body #edit_id').val(id);
+        modal.find('.modal-body #edit_name').val(name);
+        modal.find('.modal-body #edit_description').val(description);
+        modal.find('.modal-body #edit_price').val(price);
+        modal.find('.modal-body #edit_max_quantity').val(max_quantity);
+        modal.find('.modal-body #edit_for_user_positions').val(for_user_positions);
+        modal.find('.modal-body #edit_accept_orders').prop('checked', accept_orders);
+        modal.find('.modal-body #edit_is_name_required').prop('checked', is_name_required);
+        modal.find('.modal-body #edit_is_size_required').prop('checked', is_size_required);
+        modal.find('.modal-body #edit_is_image_required').prop('checked', is_image_required);
+
+    });
+
+    // log all changes
+    $('#editProductModal input').on('change', function () {
+        console.log('change', $(this).attr('id'), $(this).val(), $(this).is(':checked'));
+    });
+
+    // Ensure checkbox values are correctly set before form submission
+    $('#editProductForm').on('submit', function () {
+        $('#edit_is_name_required').val($('#edit_is_name_required').is(':checked') ? 'on' : 'off');
+        $('#edit_is_size_required').val($('#edit_is_size_required').is(':checked') ? 'on' : 'off');
+        $('#edit_is_image_required').val($('#edit_is_image_required').is(':checked') ? 'on' : 'off');
+        $('#edit_accept_orders').val($('#edit_accept_orders').is(':checked') ? 'on' : 'off');
+    });
+</script>
+
+</html>

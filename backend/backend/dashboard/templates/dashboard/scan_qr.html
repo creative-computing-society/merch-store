@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'dashboard/css/dashboard.css' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'dashboard/img/CCSLOGO.jpg' %}">
+    <title>Scan QR Codes | CCS Merchandise Store</title>
+</head>
+
+<body>
+    <div class="container mt-5">
+        <!-- <div class="row my-3">
+            <div class="col">
+                {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-info">{{ message }}</div>
+                {% endfor %}
+                {% endif %}
+            </div>
+        </div> -->
+        <div class="row my-3">
+            <div class="col" id="msgbox">
+                <!-- <h3 class="alert alert-info"></h3> -->
+                <!-- <h3 class="alert alert-danger"></h3> -->
+            </div>
+        </div>
+
+        <div class="row my-3">
+            <div class="col">
+                <h1 class="mb-4">Scan QR Codes</h1>
+
+                <a class="btn btn-primary" href="/dashboard">
+                    Back to Dashboard
+                </a>
+            </div>
+        </div>
+        <div class="row my-3">
+            <div class="col">
+                <div id="qr-reader" style="width:100%"></div>
+            </div>
+        </div>
+        <form action="{% url 'scan_qr' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="scanned_qr_code" id="scanned_qr_code">
+        </form>
+    </div>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.bundle.min.js"
+        crossorigin="anonymous"></script>
+    <script>
+        var resultContainer = document.getElementById('qr-reader-results');
+        var lastResult, countResults = 0;
+
+        function onScanSuccess(decodedText, decodedResult) {
+            if (decodedText !== lastResult) {
+                ++countResults;
+                lastResult = decodedText;
+                $.ajax({
+                    type: 'POST',
+                    url: '{% url "scan_qr" %}',
+                    data: {
+                        scanned_qr_code: decodedText,
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+                    success: function (data, textStatus, jqXHR) {
+                        var order_id = data.split(',')[0];
+                        var user_id = data.split(',')[1];
+                        var name = data.split(',')[2];
+                        var total_amount = data.split(',')[3];
+                        var order_status = data.split(',')[4];
+                        $('#msgbox').html(
+                            '<h3 class="alert alert-success">' +
+                            order_id + '<br>' +
+                            user_id + '<br>' +
+                            name + '<br>' +
+                            total_amount + '<br>' +
+                            order_status +
+                            '</h3>'
+                        );
+
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        $('#msgbox').html('<h3 class="alert alert-danger">Error: ' + jqXHR.responseText + '</h3>');
+
+                    }
+                });
+            }
+        }
+
+        var html5QrcodeScanner = new Html5QrcodeScanner(
+            "qr-reader", { fps: 10, qrbox: 250 });
+        html5QrcodeScanner.render(onScanSuccess);
+    </script>
+</body>
+
+</html>
