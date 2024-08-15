@@ -4,7 +4,6 @@ venv
 #environment variables
 .env
 
-
 #media, logs and static folder
 backend/static
 static

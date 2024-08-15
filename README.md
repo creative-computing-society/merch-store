@@ -1,4 +1,3 @@
-
 # Merch Store
 Portal for distributing Creative Computing Society merch to society members.
 
@@ -10,12 +9,12 @@ Portal for distributing Creative Computing Society merch to society members.
 **Database**: PostgreSQL
 
 ## Run Locally
-### Clone this project
+## Clone this project
 ```sh
-git clone https://github.com/creative-computing-society/ec-store-new.git
+git clone https://github.com/creative-computing-society/merch-store.git
 ```
 
-### To start the frontend server
+## To start the frontend server
 Go to project directory
 ```sh
 cd frontend
@@ -31,7 +30,7 @@ Run the start script
 npm run dev
 ```
 
-### To start the backend server
+## To start the backend server
 Go to the project directory
 ```sh
 cd backend/config
@@ -74,5 +73,5 @@ Start the server
 ```sh
 python manage.py runserver
 ```
-# Endpoints
+## Endpoints
 - 
