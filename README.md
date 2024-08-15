@@ -10,15 +10,19 @@ Portal for distributing Creative Computing Society merch to society members.
 
 **Database**: PostgreSQL
 
+## Run Live Production
+
+Visit [https://merch.ccstiet.com/](https://merch.ccstiet.com/) for using the website on live production environment
+
 ## Run Locally
 
-## Clone this project
+### Clone this project
 
 ```sh
 git clone https://github.com/creative-computing-society/merch-store.git
 ```
 
-## To start the frontend server
+### To start the frontend server
 
 Go to project directory
 
@@ -38,7 +42,7 @@ Run the start script
 npm run dev
 ```
 
-## To start the backend server
+### To start the backend server
 
 Go to the project directory
 
@@ -78,7 +82,7 @@ This project uses CCS Single Sign On (SSO) for user authentication. You would be
 
 You would also be required to add \`PAYU_MERCHANT_KEY\` and \`PAYU_MERCHANT_SALT\` for the utilisation of PayU Payment Gateway.
 
-At last, you would be required to add the database credentials in the \`.env\` file aswell, which includes the fields \`DATABASE_URL\`, \`POSTGRES_NAME\`,\`POSTGRES_USER\`, \`POSTGRES_PASSWORD\`, \`POSTGRES_HOST\`, and \`POSTGRES_PORT\`
+At last, you would be required to add the database credentials in the \`.env\` file aswell, which includes the fields \`DATABASE_URL\`, \`POSTGRES_NAME\`,\`POSTGRES_USER\`, \`POSTGRES_PASSWORD\`, \`POSTGRES_HOST\`, and \`POSTGRES_PORT\`.
 
 Run Migrations
 
@@ -145,3 +149,8 @@ python manage.py runserver
 -   (🔵) GET /scan_qr/ - Renders Scan QR code page template
 -   (🔵) POST /scan_qr/scan/ - Verify details and marked as delivered after successful scan
 -   (🔵) POST /export_csv/\<int:id\>/ - Exports a CSV file for given order item id
+
+## Maintainers
+
+-   [Akshat Bakshi - @akshat448](https://github.com/akshat448/)
+-   [Sakshham Bhagat - @SakshhamTheCoder](https://github.com/sakshhamthecoder/)
