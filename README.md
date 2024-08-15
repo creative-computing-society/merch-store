@@ -154,3 +154,4 @@ python manage.py runserver
 
 -   [Akshat Bakshi - @akshat448](https://github.com/akshat448/)
 -   [Sakshham Bhagat - @SakshhamTheCoder](https://github.com/sakshhamthecoder/)
+-   [Akarsh Srivastava - @akarsh911](https://github.com/akarsh911)
