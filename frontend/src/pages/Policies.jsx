@@ -19,46 +19,69 @@ const Policies = () => {
         },
         {
             title: 'Contact Details',
-            content: <> <p><b><u>Creative Computing Society</u></b><br />
-                Thapar Institute of Engineering and Technology,<br />
-                Patiala, Punjab, India - 147004</p>
+            content: <>
+                <p>You may contact us using the information below:</p>
                 <br />
-                <p>If you have any questions, concerns, or require assistance, please do not hesitate to reach out to us. We are here to help and ensure that your inquiries are addressed promptly.</p>
-
-                <p><b><u>Contact Email:</u></b><br />
-                    For all queries, please contact us at: <a href="mailto:ccs@thapar.edu"><b><u>ccs@thapar.edu</u></b></a></p>
-                <br />
-                <p>We value your feedback and look forward to assisting you with any questions or support you may need. Thank you for reaching out to the Creative Computing Society!</p></>
+                <p><b>Merchant Legal Entity Name:</b> AKARSH SRIVASTAVA</p>
+                <p><b>Registered Address:</b> Thapar Institute of Engineering and Technology, Patiala, Punjab, PIN: 147004</p>
+                <p><b>Operational Address:</b> Thapar Institute of Engineering and Technology, Patiala, Punjab, PIN: 147004</p>
+                <p><b>Telephone No:</b> 8920455673</p>
+                <p><b>E-Mail ID:</b> <a href="mailto:pagarwal_be22@thapar.edu">pagarwal_be22@thapar.edu</a></p>
+            </>
         },
         {
             title: 'Terms and Conditions',
-            content: <><p>Welcome to the Creative Computing Society’s official merchandise store. By accessing and using our website, you agree to comply with and be bound by the following terms and conditions. Please read these terms carefully. If you do not agree with any part of these terms, you should not use our website.</p>
+            content: (
+                <>
+                    <p>These Terms and Conditions, along with privacy policy or other terms (“Terms”) constitute a binding agreement by and between AKARSH SRIVASTAVA, ( “Website Owner” or “we” or “us” or “our”) and you (“you” or “your”) and relate to your use of our website, goods (as applicable) or services (as applicable) (collectively, “Services”).</p>
 
-                <b><u>1. General Terms</u></b>
-                <p>These terms and conditions govern your use of our website and the purchase of any merchandise from us. By using our website, you acknowledge that you have read, understood, and agree to be bound by these terms and conditions. We reserve the right to modify these terms at any time, and such changes will be effective immediately upon posting on the website. Your continued use of the website constitutes your acceptance of any changes to these terms.</p>
+                    <p>By using our website and availing the Services, you agree that you have read and accepted these Terms (including the Privacy Policy). We reserve the right to modify these Terms at any time and without assigning any reason. It is your responsibility to periodically review these Terms to stay informed of updates.</p>
 
-                <b><u>2. Use of the Website</u></b>
-                <p>You agree to use the website only for lawful purposes and in a manner that does not infringe the rights of, restrict, or inhibit anyone else's use and enjoyment of the website. Prohibited behavior includes, but is not limited to, transmitting any material that is unlawful, threatening, defamatory, obscene, or otherwise objectionable.</p>
+                    <p>The use of this website or availing of our Services is subject to the following terms of use:</p>
 
-                <b><u>3. Intellectual Property</u></b>
-                <p>The content, design, and layout of the website, including but not limited to text, graphics, images, logos, and trademarks, are the property of Creative Computing Society and are protected by intellectual property laws. You may not reproduce, distribute, or otherwise use any content from this website without our prior written consent.</p>
+                    <b><u>1. Information Accuracy</u></b>
+                    <p>To access and use the Services, you agree to provide true, accurate and complete information to us during and after registration, and you shall be responsible for all acts done through the use of your registered account.</p>
 
-                <b><u>4. Product Information</u></b>
-                <p>We strive to ensure that all product descriptions and specifications are accurate. However, we do not warrant that the descriptions or other content on our website are accurate, complete, reliable, current, or error-free. If a product offered by us is not as described, your sole remedy is to return it in unused condition.</p>
+                    <b><u>2. Warranty Disclaimer</u></b>
+                    <p>Neither we nor any third parties provide any warranty or guarantee as to the accuracy, timeliness, performance, completeness or suitability of the information and materials offered on this website or through the Services, for any specific purpose. You acknowledge that such information and materials may contain inaccuracies or errors and we expressly exclude liability for any such inaccuracies or errors to the fullest extent permitted by law.</p>
 
-                <b><u>5. Ordering and Payment</u></b>
-                <p>By placing an order, you agree to provide accurate and complete information. We reserve the right to refuse or cancel any order if we suspect fraudulent activity or other issues with the order. Payment must be made in full at the time of purchase. We accept various payment methods, which will be detailed during the checkout process.</p>
+                    <b><u>3. User Responsibility</u></b>
+                    <p>Your use of our Services and the website is solely at your own risk and discretion. You are required to independently assess and ensure that the Services meet your requirements.</p>
 
-                <b><u>6. Limitation of Liability</u></b>
-                <p>To the fullest extent permitted by law, Creative Computing Society shall not be liable for any indirect, incidental, special, or consequential damages arising out of or related to your use of the website or the purchase of any merchandise. Our liability is limited to the maximum extent permitted by law.</p>
+                    <b><u>4. Intellectual Property</u></b>
+                    <p>The contents of the Website and the Services are proprietary to Us and you will not have any authority to claim any intellectual property rights, title, or interest in its contents.</p>
 
-                <b><u>7. Governing Law</u></b>
-                <p>These terms and conditions are governed by and construed in accordance with the laws of TIET, without regard to its conflict of law principles. Any disputes arising from or related to these terms and conditions shall be subject to the exclusive jurisdiction of the courts located in Patiala.</p>
+                    <b><u>5. Unauthorized Use</u></b>
+                    <p>You acknowledge that unauthorized use of the Website or the Services may lead to action against you as per these Terms or applicable laws.</p>
 
-                <b><u>8. Contact Us</u></b>
-                <p>If you have any questions about these terms and conditions or our shipping policy, please contact us at: <a href="mailto:ccs@thapar.edu"><b><u>ccs@thapar.edu</u></b></a></p>
+                    <b><u>6. Payment of Services</u></b>
+                    <p>You agree to pay us the charges associated with availing the Services.</p>
 
-                <p>Thank you for choosing to shop with us. We appreciate your support and look forward to serving you!</p></>
+                    <b><u>7. Prohibited Usage</u></b>
+                    <p>You agree not to use the website and/or Services for any purpose that is unlawful, illegal, or forbidden by these Terms, or Indian or local laws that might apply to you.</p>
+
+                    <b><u>8. Third-Party Links</u></b>
+                    <p>You agree and acknowledge that the website and the Services may contain links to other third-party websites. On accessing these links, you will be governed by the terms of use, privacy policy, and such other policies of such third-party websites.</p>
+
+                    <b><u>9. Legal Binding</u></b>
+                    <p>You understand that upon initiating a transaction for availing the Services you are entering into a legally binding and enforceable contract with us for the Services.</p>
+
+                    <b><u>10. Refund Policy</u></b>
+                    <p>You shall be entitled to claim a refund of the payment made by you in case we are not able to provide the Service. The timelines for such return and refund will be according to the specific Service you have availed or within the time period provided in our policies (as applicable). In case you do not raise a refund claim within the stipulated time, then this would make you ineligible for a refund.</p>
+
+                    <b><u>11. Force Majeure</u></b>
+                    <p>Notwithstanding anything contained in these Terms, the parties shall not be liable for any failure to perform an obligation under these Terms if performance is prevented or delayed by a force majeure event.</p>
+
+                    <b><u>12. Governing Law</u></b>
+                    <p>These Terms and any dispute or claim relating to it, or its enforceability, shall be governed by and construed in accordance with the laws of India.</p>
+
+                    <b><u>13. Jurisdiction</u></b>
+                    <p>All disputes arising out of or in connection with these Terms shall be subject to the exclusive jurisdiction of the courts in Patiala, Punjab.</p>
+
+                    <b><u>14. Contact Information</u></b>
+                    <p>All concerns or communications relating to these Terms must be communicated to us using the contact information provided on this website.</p>
+                </>
+            )
         },
         {
             title: 'Shipping Policy',
