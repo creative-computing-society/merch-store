@@ -18,7 +18,7 @@ class ThreeCharAutoField(models.CharField):
             else:
                 last_id = 1
 
-            value = 'order_'+str(last_id).zfill(3)  # Pad with zeros to ensure 3 chars
+            value = 'order_'+last_id
             setattr(model_instance, self.attname, value)
         return super().pre_save(model_instance, add)
 
