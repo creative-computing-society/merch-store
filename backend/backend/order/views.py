@@ -338,7 +338,7 @@ class PaymentWebhookView(APIView):
     def post(self, request, order_id):
         try:
             api_response = Cashfree().PGOrderFetchPayments(x_api_version, str(order_id), None)
-            api_response = api_response.data
+            api_response = api_response.data[0] if api_response else None
             print(api_response)
         except Payment.DoesNotExist:
             return Response(
