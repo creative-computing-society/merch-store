@@ -282,6 +282,7 @@ class PaymentView(APIView):
 def payment_success(payment):
     payment.order.is_verified = True
     payment.order.save()
+    payment.status = "success"
     payment.save()
 
     # Increment the discount code uses if present
