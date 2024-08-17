@@ -16,7 +16,10 @@ const PaymentStatus = () => {
     const [isModalVisible, setIsModalVisible] = useState(false);
 
     useEffect(() => {
-        api.post('/payment/verify/', { txnid: txnid })
+
+        api.post('/payment/webhook/'+txnid+"/",{},false)
+        .then(response =>{
+            api.post('/payment/verify/', { txnid: txnid })
             .then(response => {
                 setPaymentDetails(response);
                 if (response.status !== 'success') {
@@ -27,6 +30,10 @@ const PaymentStatus = () => {
             }).finally(() => {
                 setLoading(false);
             });
+        })
+      
+
+
     }, [txnid]);
 
     useEffect(() => {
