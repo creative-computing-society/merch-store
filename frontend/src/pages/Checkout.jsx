@@ -80,7 +80,7 @@ const Checkout = () => {
 
     const doPayment = async (session) => {
         let checkoutOptions = {
-            paymentSessionId: "session_53_LJ1hTaOG6cEZbfIyZq-9raQtGqPRfY9rDFCkzTaE9-iC9iFOb9YDiXMApTTmOcur9iCOOtBrPRseSADwRNVHoRRxADfVfKXvuE-y0FwiR",
+            paymentSessionId: session,
             redirectTarget: "_self",
         };
         cashfree.checkout(checkoutOptions);
@@ -100,7 +100,7 @@ const Checkout = () => {
             .then(response => {
                 api.post(`/payment/${response.order.id}/`).then(response => {
                     setLoading(false);
-                    doPayment(response.session);
+                    doPayment(response.payment_session_id);
                 });
             }).catch(error => {
                 alert('Something went wrong! Please try again later.');
