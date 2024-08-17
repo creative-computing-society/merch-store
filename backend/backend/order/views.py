@@ -235,7 +235,7 @@ class PaymentView(APIView):
             )
 
         amount = "{:.2f}".format(float(order.updated_amount))
-        productinfo = "Order_" + str(order.id)
+        productinfo = str(order.id)
         firstname = str(user.name.split()[0] if " " in user.name else user.name)
         email = str(user.email)
         phone = str(user.phone_no)
