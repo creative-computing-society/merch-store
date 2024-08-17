@@ -64,7 +64,6 @@ class Payment(models.Model):
     status = models.CharField(max_length=20)  # 'success', 'failure', 'pending'
     payment_date = models.DateTimeField(auto_now_add=True)
     payment_id = models.CharField(max_length=100, null=True, blank=True, unique=True)  # Payment gateway's payment ID
-    payment_method = models.JSONField(null=True, blank=True)  # Payment gateway's payment method
     reason = models.TextField(null=True, blank=True)  # Reason for failure
     
 

@@ -279,10 +279,9 @@ class PaymentView(APIView):
         return Response(payload, status=status.HTTP_200_OK)
 
 
-def payment_success(payment, api_response):
+def payment_success(payment):
     payment.order.is_verified = True
     payment.order.save()
-    payment.payment_method = api_response.payment_method
     payment.save()
 
     # Increment the discount code uses if present
@@ -320,10 +319,8 @@ def payment_success(payment, api_response):
     return redirect(redirect_url)
 
 
-def payment_failure(payment, api_response):
+def payment_failure(payment):
     payment.status = "failure"
-    payment.payment_id = api_response.cf_payment_id
-    payment.reason = "Payment failed" if not api_response else api_response.payment_message
     payment.save()
 
     if status == "failure":
@@ -347,11 +344,11 @@ class PaymentWebhookView(APIView):
             )
         
         if api_response and api_response.payment_status == 'SUCCESS':
-            payment = Payment.objects.get(transaction_id=api_response.order_id)
-            payment_success(payment, api_response)
+            payment = Payment.objects.get(transaction_id=order_id)
+            payment_success(payment)
         else:
-            payment = Payment.objects.get(transaction_id=api_response.order_id)
-            payment_failure(payment, api_response)
+            payment = Payment.objects.get(transaction_id=order_id)
+            payment_failure(payment)
 
         return Response(status=status.HTTP_200_OK)
 
