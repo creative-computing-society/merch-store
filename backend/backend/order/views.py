@@ -247,7 +247,7 @@ class PaymentView(APIView):
         customerDetails.customer_name = firstname
         customerDetails.customer_email = email
 
-        createOrderRequest = CreateOrderRequest(order_id=str(order_id), order_amount=amount, order_currency="INR", customer_details=customerDetails)
+        createOrderRequest = CreateOrderRequest(order_id=str(order_id), order_amount=float(amount), order_currency="INR", customer_details=customerDetails)
 
         orderMeta = OrderMeta()
         orderMeta.return_url = f"https://merch.ccstiet.com/payment-status/{order_id}"
