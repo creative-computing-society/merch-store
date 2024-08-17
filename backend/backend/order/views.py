@@ -259,6 +259,7 @@ class PaymentView(APIView):
         try:
             api_response = Cashfree().PGCreateOrder(x_api_version, createOrderRequest, None, None)
         except Exception as e:
+            print(e)
             return Response(
                 {"detail": "Order creation failed at cashfree"}, status=status.HTTP_404_NOT_FOUND
             )
