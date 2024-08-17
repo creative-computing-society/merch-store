@@ -250,8 +250,8 @@ class PaymentView(APIView):
         createOrderRequest = CreateOrderRequest(order_id=str(order_id), order_amount=float(amount), order_currency="INR", customer_details=customerDetails)
 
         orderMeta = OrderMeta()
-        orderMeta.return_url = f"https://merch.ccstiet.com/payment-status/{order_id}"
-        orderMeta.notify_url = f"https://api.merch.ccstiet.com/payment/webhook/{order_id}"
+        orderMeta.return_url = f"https://merch.ccstiet.com/payment-status/{order_id}/"
+        orderMeta.notify_url = f"https://api.merch.ccstiet.com/payment/webhook/{order_id}/"
         orderMeta.payment_methods = "cc,dc,upi"
         createOrderRequest.order_meta = orderMeta
         createOrderRequest.order_expiry_time = expiry_time
