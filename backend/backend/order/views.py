@@ -258,6 +258,7 @@ class PaymentView(APIView):
 
         try:
             api_response = Cashfree().PGCreateOrder(x_api_version, createOrderRequest, None, None)
+            api_response = api_response[0]
         except Exception as e:
             print(e)
             return Response(
@@ -337,6 +338,7 @@ class PaymentWebhookView(APIView):
     def post(self, request, order_id):
         try:
             api_response = Cashfree().PGOrderFetchPayments(x_api_version, str(order_id), None)
+            api_response = api_response[0]
         except Payment.DoesNotExist:
             return Response(
                 {"detail": "Payment record not found."},
@@ -345,10 +347,10 @@ class PaymentWebhookView(APIView):
         
         if api_response and api_response['payment_status'] == 'SUCCESS':
             payment = Payment.objects.get(transaction_id=api_response['order_id'])
-            payment_success(payment)
+            payment_success(payment, api_response)
         else:
             payment = Payment.objects.get(transaction_id=api_response['order_id'])
-            payment_failure(payment)
+            payment_failure(payment, api_response)
 
         return Response(status=status.HTTP_200_OK)
 
