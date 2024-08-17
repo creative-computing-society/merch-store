@@ -4,8 +4,26 @@ from products.models import Product
 from login.models import CustomUser as User
 from discounts.models import DiscountCode
 
+class ThreeCharAutoField(models.CharField):
+    def __init__(self, *args, **kwargs):
+        kwargs['max_length'] = 3
+        kwargs['editable'] = False
+        super().__init__(*args, **kwargs)
+
+    def pre_save(self, model_instance, add):
+        if add:
+            last_id = model_instance.__class__.objects.all().order_by('-id').first()
+            if last_id:
+                last_id = int(last_id.id) + 1
+            else:
+                last_id = 1
+
+            value = str(last_id).zfill(3)  # Pad with zeros to ensure 3 chars
+            setattr(model_instance, self.attname, value)
+        return super().pre_save(model_instance, add)
+
 class Order(models.Model):
-    id = models.AutoField(primary_key=True)
+    id = ThreeCharAutoField(primary_key=True)
     user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_amount = models.DecimalField(max_digits=10, decimal_places=2)
