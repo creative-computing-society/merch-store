@@ -339,6 +339,7 @@ class PaymentWebhookView(APIView):
         try:
             api_response = Cashfree().PGOrderFetchPayments(x_api_version, str(order_id), None)
             api_response = api_response.data
+            print(api_response)
         except Payment.DoesNotExist:
             return Response(
                 {"detail": "Payment record not found."},
