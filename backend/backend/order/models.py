@@ -15,7 +15,7 @@ class ThreeCharAutoField(models.CharField):
             last_id = model_instance.__class__.objects.all().order_by('-id').first()
             if last_id:
                 last_id = last_id.id.split('_')[1]
-                last_id = int(last_id.id) + 1
+                last_id = int(last_id) + 1
             else:
                 last_id = 1
 
