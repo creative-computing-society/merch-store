@@ -258,9 +258,6 @@ class PaymentView(APIView):
 
         try:
             api_response = Cashfree().PGCreateOrder(x_api_version, createOrderRequest, None, None)
-            print(api_response)
-            print(api_response.data)
-            print(api_response.data.cf_order_id)       
             api_response = api_response.data
         except Exception as e:
             print(e)
@@ -269,7 +266,7 @@ class PaymentView(APIView):
             )
 
         payload = {
-            'payment_session_id': api_response['payment_session_id']
+            'payment_session_id': api_response.payment_session_id,
         }
 
         Payment.objects.create(
@@ -285,7 +282,7 @@ class PaymentView(APIView):
 def payment_success(payment, api_response):
     payment.order.is_verified = True
     payment.order.save()
-    payment.payment_method = api_response['payment_method']
+    payment.payment_method = api_response.payment_method
     payment.save()
 
     # Increment the discount code uses if present
@@ -325,8 +322,8 @@ def payment_success(payment, api_response):
 
 def payment_failure(payment, api_response):
     payment.status = "failure"
-    payment.payment_id = api_response['cf_payment_id']
-    payment.reason = "Payment failed" if not api_response else api_response['payment_message']
+    payment.payment_id = api_response.cf_payment_id
+    payment.reason = "Payment failed" if not api_response else api_response.payment_message
     payment.save()
 
     if status == "failure":
@@ -341,18 +338,18 @@ class PaymentWebhookView(APIView):
     def post(self, request, order_id):
         try:
             api_response = Cashfree().PGOrderFetchPayments(x_api_version, str(order_id), None)
-            api_response = api_response.data[0]
+            api_response = api_response.data
         except Payment.DoesNotExist:
             return Response(
                 {"detail": "Payment record not found."},
                 status=status.HTTP_404_NOT_FOUND,
             )
         
-        if api_response and api_response['payment_status'] == 'SUCCESS':
-            payment = Payment.objects.get(transaction_id=api_response['order_id'])
+        if api_response and api_response.payment_status == 'SUCCESS':
+            payment = Payment.objects.get(transaction_id=api_response.order_id)
             payment_success(payment, api_response)
         else:
-            payment = Payment.objects.get(transaction_id=api_response['order_id'])
+            payment = Payment.objects.get(transaction_id=api_response.order_id)
             payment_failure(payment, api_response)
 
         return Response(status=status.HTTP_200_OK)
