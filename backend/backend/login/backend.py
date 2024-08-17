@@ -27,8 +27,8 @@ class SSOAuthenticationBackend(BaseBackend):
 
         if user_info and not isinstance(user_info, Response):
             try:
-                user = User.objects.get(email=user_info["email"])
-                logger.debug(f"User {user_info['email']} found in database.")
+                user = User.objects.get(id=user_info["rollNo"])
+                logger.debug(f"User with ID {user_info['rollNo']} found in database.")
             except User.DoesNotExist:
                 roles = user_info.get("roles", [])
                 user_role = "user"
@@ -50,7 +50,7 @@ class SSOAuthenticationBackend(BaseBackend):
                 )
                 user.set_unusable_password()
                 user.save()
-                logger.debug(f"User {user_info['email']} created successfully.")
+                logger.debug(f"User with ID {user_info['rollNo']} created successfully.")
             return user
         logger.debug("User info not valid or token is invalid.")
         return None
