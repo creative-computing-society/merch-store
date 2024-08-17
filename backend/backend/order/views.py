@@ -21,6 +21,7 @@ from cashfree_pg.api_client import Cashfree
 from cashfree_pg.models.customer_details import CustomerDetails
 from cashfree_pg.models.order_meta import OrderMeta
 from datetime import datetime, timedelta
+import pytz
 
 Cashfree.XClientId = settings.CASHFREE_CLIENT_ID
 Cashfree.XClientSecret = settings.CASHFREE_CLIENT_SECRET
@@ -240,8 +241,7 @@ class PaymentView(APIView):
         email = str(user.email)
         phone = str(user.phone_no)
         
-        expiry_time = (datetime.now() + timedelta(minutes=5)).isoformat()
-
+        expiry_time = (datetime.now(pytz.timezone('Asia/Kolkata')) + timedelta(minutes=5)).isoformat()
 
         customerDetails = CustomerDetails(customer_id=email, customer_phone=phone)
         customerDetails.customer_name = firstname
