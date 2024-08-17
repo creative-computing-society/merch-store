@@ -12,7 +12,7 @@ class ThreeCharAutoField(models.CharField):
 
     def pre_save(self, model_instance, add):
         if add:
-            last_id = model_instance.__class__.objects.all().order_by('-id').first()
+            last_id = model_instance.__class__.objects.all().values_list('id', flat=True).last()
             if last_id:
                 last_id = last_id.id.split('_')[1]
                 last_id = int(last_id) + 1
