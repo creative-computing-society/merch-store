@@ -4,6 +4,11 @@ import Button from '../components/Button';
 import { faGift, faMoneyBill, faRemove } from '@fortawesome/free-solid-svg-icons';
 import { Link, redirect } from 'react-router-dom';
 import api_url from '../helpers/Config';
+import { load } from "@cashfreepayments/cashfree-js";
+
+
+  
+
 
 const Checkout = () => {
     const [cartProducts, setCartProducts] = useState([]);
@@ -65,6 +70,22 @@ const Checkout = () => {
             });
     };
 
+    let cashfree;
+    var initializeSDK = async function () {          
+        cashfree = await load({
+            mode: "production"
+        });
+    }
+    initializeSDK();
+
+    const doPayment = async (session) => {
+        let checkoutOptions = {
+            paymentSessionId: "session_53_LJ1hTaOG6cEZbfIyZq-9raQtGqPRfY9rDFCkzTaE9-iC9iFOb9YDiXMApTTmOcur9iCOOtBrPRseSADwRNVHoRRxADfVfKXvuE-y0FwiR",
+            redirectTarget: "_self",
+        };
+        cashfree.checkout(checkoutOptions);
+    };
+  
     const handlePayment = (e) => {
         e.preventDefault();
         setDisabled(true);
@@ -78,8 +99,8 @@ const Checkout = () => {
         api.post('/order/place/', body)
             .then(response => {
                 api.post(`/payment/${response.order.id}/`).then(response => {
-                    setPaymentPayload(response);
                     setLoading(false);
+                    doPayment(response.session);
                 });
             }).catch(error => {
                 alert('Something went wrong! Please try again later.');
@@ -130,27 +151,9 @@ const Checkout = () => {
                                 <span className='font-bold'>₹{parseFloat(cartAmt.updated_amount).toFixed(2)}</span>
                             </div>
                         </div>
-                        <form action='https://test.payu.in/_payment' method='post' onSubmit={handlePayment} id="paymentForm">
-                            <input type="hidden" name="key" value={paymentPayload.key} />
-                            <input type="hidden" name="txnid" value={paymentPayload.txnid} />
-                            <input type="hidden" name="amount" value={paymentPayload.amount} />
-                            <input type="hidden" name="firstname" value={paymentPayload.firstname} />
-                            <input type="hidden" name="email" value={paymentPayload.email} />
-                            <input type="hidden" name="phone" value={paymentPayload.phone} />
-                            <input type="hidden" name="productinfo" value={paymentPayload.productinfo} />
-                            {/* <input type="hidden" name="lastname" value={paymentPayload.lastName}  /> */}
-                            <input type="hidden" name="surl" value={paymentPayload.surl} />
-                            <input type="hidden" name="furl" value={paymentPayload.furl} />
-                            <input type="hidden" name="udf1" value={paymentPayload.udf1} />
-                            <input type="hidden" name="udf2" value={paymentPayload.udf2} />
-                            <input type="hidden" name="udf3" value={paymentPayload.udf3} />
-                            <input type="hidden" name="udf4" value={paymentPayload.udf4} />
-                            <input type="hidden" name="udf5" value={paymentPayload.udf5} />
-                            <input type="hidden" name="enforce_paymethod" value="upi" />
-                            <input type="hidden" name="hash" value={paymentPayload.hash} />
-                            <Button type="submit" disabled={disabled} className='px-4 py-2 mt-4 w-full' icon={faMoneyBill} isActive text="Pay Now" />
+                          <Button type="submit" disabled={disabled} className='px-4 py-2 mt-4 w-full' icon={faMoneyBill} onClick={handlePayment} isActive text="Pay Now" />
 
-                        </form>
+                     
                     </div>
                 </div>
 
