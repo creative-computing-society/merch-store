@@ -22,6 +22,7 @@ from cashfree_pg.models.customer_details import CustomerDetails
 from cashfree_pg.models.order_meta import OrderMeta
 from datetime import datetime, timedelta
 import pytz
+import random
 
 Cashfree.XClientId = settings.CASHFREE_CLIENT_ID
 Cashfree.XClientSecret = settings.CASHFREE_CLIENT_SECRET
@@ -192,8 +193,11 @@ class Checkout(APIView):
                 )
 
         with transaction.atomic():
+            id_num = random.randint(100000, 999999)
+            while Order.objects.filter(id=f"ccs_order_{id_num}").exists():
+                id_num = random.randint(100000, 999999)
             order = Order.objects.create(
-                user=user, updated_amount=updated_amount, total_amount=total_amount
+                id=f"ccs_order_{id_num}",user=user, updated_amount=updated_amount, total_amount=total_amount
             )
             for item in cart_items:
                 OrderItem.objects.create(
