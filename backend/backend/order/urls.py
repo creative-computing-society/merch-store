@@ -8,7 +8,6 @@ urlpatterns = [
     path("order/place/", Checkout.as_view(), name="place_order"),
     path("order/apply-discount/", ApplyDiscount.as_view(), name="apply_discount"),
     path('payment/<int:order_id>/', PaymentView.as_view(), name='payment_checkout'),
-    path('payment/success/', PaymentSuccessView.as_view(), name='payment_success'),
-    path('payment/failure/', PaymentFailureView.as_view(), name='payment_failure'),
+    path('payment/webhook/<int:order_id>/', PaymentWebhookView.as_view(), name='payment_webhook'),
     path('payment/verify/', PaymentVerifyView.as_view(), name='payment_verfiy'),
 ]

@@ -16,6 +16,17 @@ from products.models import CartItem
 
 from .tasks import send_order_success_email_async
 
+from cashfree_pg.models.create_order_request import CreateOrderRequest
+from cashfree_pg.api_client import Cashfree
+from cashfree_pg.models.customer_details import CustomerDetails
+from cashfree_pg.models.order_meta import OrderMeta
+from datetime import datetime, timedelta
+
+Cashfree.XClientId = settings.CASHFREE_CLIENT_ID
+Cashfree.XClientSecret = settings.CASHFREE_CLIENT_SECRET
+Cashfree.XEnvironment = Cashfree.PRODUCTION
+x_api_version = "2023-08-01"
+
 
 def generateHash(params, salt):
     hashString = (
@@ -223,40 +234,42 @@ class PaymentView(APIView):
                 {"detail": "Order not found."}, status=status.HTTP_404_NOT_FOUND
             )
 
-        key = settings.PAYU_MERCHANT_KEY
-        salt = settings.PAYU_MERCHANT_SALT
-        txnid = str(order.id) + str(int(time.time() * 1000))
         amount = "{:.2f}".format(float(order.updated_amount))
         productinfo = "Order_" + str(order.id)
         firstname = str(user.name.split()[0] if " " in user.name else user.name)
         email = str(user.email)
         phone = str(user.phone_no)
-        surl = settings.PAYU_SUCCESS_URL
-        furl = settings.PAYU_FAILURE_URL
+        
+        expiry_time = (datetime.now() + timedelta(minutes=5)).isoformat()
+
+
+        customerDetails = CustomerDetails(customer_id=email, customer_phone=phone)
+        customerDetails.customer_name = firstname
+        customerDetails.customer_email = email
+
+        createOrderRequest = CreateOrderRequest(order_id=order_id, order_amount=amount, order_currency="INR", customer_details=customerDetails)
+
+        orderMeta = OrderMeta()
+        orderMeta.return_url = f"https://merch.ccstiet.com/payment-status/{order_id}"
+        orderMeta.notify_url = f"https://api.merch.ccstiet.com/payment/webhook/{order_id}"
+        orderMeta.payment_methods = "cc,dc,upi"
+        createOrderRequest.order_meta = orderMeta
+        createOrderRequest.order_expiry_time = expiry_time
+
+        try:
+            api_response = Cashfree().PGCreateOrder(x_api_version, createOrderRequest, None, None)
+        except Exception as e:
+            return Response(
+                {"detail": "Order creation failed at cashfree"}, status=status.HTTP_404_NOT_FOUND
+            )
 
         payload = {
-            "key": key,
-            "txnid": txnid,
-            "amount": amount,
-            "firstname": firstname,
-            "email": email,
-            "phone": phone,
-            "productinfo": productinfo,
-            "surl": surl,
-            "furl": furl,
-            "udf1": "",
-            "udf2": "",
-            "udf3": "",
-            "udf4": "",
-            "udf5": "",
+            'payment_session_id': api_response['payment_session_id']
         }
-
-        hashValue = generateHash(payload, salt)
-        payload["hash"] = hashValue
 
         Payment.objects.create(
             order=order,
-            transaction_id=txnid,
+            transaction_id=order_id,
             paid_amount=order.updated_amount,
             status="pending",
         )
@@ -264,91 +277,79 @@ class PaymentView(APIView):
         return Response(payload, status=status.HTTP_200_OK)
 
 
-class PaymentSuccessView(APIView):
-    def post(self, request):
-        txnid = request.data.get("txnid")
-        status = request.data.get("status")
-        payment_id = request.data.get("mihpayid")
-        reason = request.data.get("field9")
+def payment_success(payment, api_response):
+    payment.order.is_verified = True
+    payment.order.save()
+    payment.payment_method = api_response['payment_method']
+    payment.save()
 
+    # Increment the discount code uses if present
+    if payment.order.discount_code:
+        payment.order.discount_code.uses += 1
+        payment.order.discount_code.save()
+
+    # Remove items from the cart
+    CartItem.objects.filter(user=payment.order.user).delete()
+
+    order_items = OrderItem.objects.filter(order=payment.order).all()
+    prod_list = []
+    for item in order_items:
+        prod_list.append(
+            {
+                "name": item.product.name,
+                "quantity": item.quantity,
+            }
+        )
+
+    # Generate and save QR code
+    qr_data = generate_qr_code(payment.order)
+
+    send_order_success_email_async(
+        payment.transaction_id,
+        payment.order.updated_amount,
+        prod_list,
+        payment.order.user.name,
+        qr_data,
+        payment.order.user.email,
+    )
+
+    # redirect_url = f"http://localhost:3000/payment-status/{txnid}"
+    redirect_url = f"https://merch.ccstiet.com/payment-status/{payment.transaction_id}"
+    return redirect(redirect_url)
+
+
+def payment_failure(payment, api_response):
+    payment.status = "failure"
+    payment.payment_id = api_response['cf_payment_id']
+    payment.reason = "Payment failed" if not api_response else api_response['payment_message']
+    payment.save()
+
+    if status == "failure":
+        payment.order.is_verified = False
+        payment.order.save()
+        # redirect_url = f"http://localhost:3000/payment-status/{txnid}"
+        redirect_url = f"https://merch.ccstiet.com/payment-status/{payment.transaction_id}"
+        return redirect(redirect_url)
+
+
+class PaymentWebhookView(APIView):
+    def post(self, request, order_id):
         try:
-            payment = Payment.objects.get(transaction_id=txnid)
-            payment.status = status
-            payment.payment_id = payment_id
-            payment.reason = reason
-            payment.save()
-
-            if status == "success":
-                payment.order.is_verified = True
-                payment.order.save()
-
-                # Increment the discount code uses if present
-                if payment.order.discount_code:
-                    payment.order.discount_code.uses += 1
-                    payment.order.discount_code.save()
-
-                # Remove items from the cart
-                CartItem.objects.filter(user=payment.order.user).delete()
-
-                order_items = OrderItem.objects.filter(order=payment.order).all()
-                prod_list = []
-                for item in order_items:
-                    prod_list.append(
-                        {
-                            "name": item.product.name,
-                            "quantity": item.quantity,
-                        }
-                    )
-
-                # Generate and save QR code
-                qr_data = generate_qr_code(payment.order)
-
-                send_order_success_email_async(
-                    payment.transaction_id,
-                    payment.order.updated_amount,
-                    prod_list,
-                    payment.order.user.name,
-                    qr_data,
-                    payment.order.user.email,
-                )
-
-                # redirect_url = f"http://localhost:3000/payment-status/{txnid}"
-                redirect_url = f"https://merch.ccstiet.com/payment-status/{txnid}"
-                return redirect(redirect_url)
-
+            api_response = Cashfree().PGOrderFetchPayments(x_api_version, order_id, None)
         except Payment.DoesNotExist:
             return Response(
                 {"detail": "Payment record not found."},
                 status=status.HTTP_404_NOT_FOUND,
             )
+        
+        if api_response and api_response['payment_status'] == 'SUCCESS':
+            payment = Payment.objects.get(transaction_id=api_response['order_id'])
+            payment_success(payment)
+        else:
+            payment = Payment.objects.get(transaction_id=api_response['order_id'])
+            payment_failure(payment)
 
-
-class PaymentFailureView(APIView):
-    def post(self, request):
-        txnid = request.data.get("txnid")
-        status = request.data.get("status")
-        payment_id = request.data.get("mihpayid")
-        reason = request.data.get("field9")
-
-        try:
-            payment = Payment.objects.get(transaction_id=txnid)
-            payment.status = status
-            payment.payment_id = payment_id
-            payment.reason = reason
-            payment.save()
-
-            if status == "failure":
-                payment.order.is_verified = False
-                payment.order.save()
-                # redirect_url = f"http://localhost:3000/payment-status/{txnid}"
-                redirect_url = f"https://merch.ccstiet.com/payment-status/{txnid}"
-                return redirect(redirect_url)
-
-        except Payment.DoesNotExist:
-            return Response(
-                {"detail": "Payment record not found."},
-                status=status.HTTP_404_NOT_FOUND,
-            )
+        return Response(status=status.HTTP_200_OK)
 
 
 class PaymentVerifyView(APIView):
