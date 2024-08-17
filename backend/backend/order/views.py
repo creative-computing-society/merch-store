@@ -247,7 +247,7 @@ class PaymentView(APIView):
         customerDetails.customer_name = firstname
         customerDetails.customer_email = email
 
-        createOrderRequest = CreateOrderRequest(order_id=order_id, order_amount=amount, order_currency="INR", customer_details=customerDetails)
+        createOrderRequest = CreateOrderRequest(order_id=str(order_id), order_amount=amount, order_currency="INR", customer_details=customerDetails)
 
         orderMeta = OrderMeta()
         orderMeta.return_url = f"https://merch.ccstiet.com/payment-status/{order_id}"
@@ -335,7 +335,7 @@ def payment_failure(payment, api_response):
 class PaymentWebhookView(APIView):
     def post(self, request, order_id):
         try:
-            api_response = Cashfree().PGOrderFetchPayments(x_api_version, order_id, None)
+            api_response = Cashfree().PGOrderFetchPayments(x_api_version, str(order_id), None)
         except Payment.DoesNotExist:
             return Response(
                 {"detail": "Payment record not found."},
