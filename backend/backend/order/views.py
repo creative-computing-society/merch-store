@@ -241,7 +241,7 @@ class PaymentView(APIView):
         email = str(user.email)
         phone = str(user.phone_no)
         
-        expiry_time = (datetime.now(pytz.timezone('Asia/Kolkata')) + timedelta(minutes=15)).isoformat()
+        expiry_time = (datetime.now(pytz.timezone('Asia/Kolkata')) + timedelta(minutes=20)).isoformat()
 
         customerDetails = CustomerDetails(customer_id=str(user.id), customer_phone=phone)
         customerDetails.customer_name = firstname
