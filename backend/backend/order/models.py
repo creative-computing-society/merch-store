@@ -6,7 +6,7 @@ from discounts.models import DiscountCode
 
 class ThreeCharAutoField(models.CharField):
     def __init__(self, *args, **kwargs):
-        kwargs['max_length'] = 3
+        kwargs['max_length'] = 50
         kwargs['editable'] = False
         super().__init__(*args, **kwargs)
 
@@ -23,7 +23,7 @@ class ThreeCharAutoField(models.CharField):
         return super().pre_save(model_instance, add)
 
 class Order(models.Model):
-    id = ThreeCharAutoField(primary_key=True)
+    id = ThreeCharAutoField(primary_key=True, max_length=50)
     user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_amount = models.DecimalField(max_digits=10, decimal_places=2)
