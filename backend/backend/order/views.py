@@ -260,8 +260,8 @@ class PaymentView(APIView):
             api_response = Cashfree().PGCreateOrder(x_api_version, createOrderRequest, None, None)
             print(api_response)
             print(api_response.data)
-            print(api_response.data[0])       
-            api_response = api_response.data[0]
+            print(api_response.data.cf_order_id)       
+            api_response = api_response.data
         except Exception as e:
             print(e)
             return Response(
