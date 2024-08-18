@@ -29,5 +29,5 @@ urlpatterns = [
     ),
     path("scan_qr/", views.render_qr_page, name="scan_qr_page"),
     path("scan_qr/scan/", views.scan_qr, name="scan_qr"),
-    path("export_csv/<int:id>", views.successful_order_csv, name="export_csv"),
+    path("export_csv/<int:id>/", views.successful_order_csv, name="export_csv"),
 ]
