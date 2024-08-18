@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        WORKSPACE_DIR = '/home/ccs/merch_store'
+        WORKSPACE_DIR = '/home/ccs/merch-store'
     }
 
     stages {
