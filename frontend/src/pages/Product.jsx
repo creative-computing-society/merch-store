@@ -190,7 +190,7 @@ const Product = () => {
                                     <div className='flex flex-col'>
                                         <label htmlFor='size' className='text-l'>Size:
                                             {product.size_chart_image && (
-                                                <a href={product.size_chart_image} target='_blank' rel='noreferrer' className='ml-2 text-blue-500 text-xs'>
+                                                <a href={"https://api.merch.ccstiet.com"+product.size_chart_image} target='_blank' rel='noreferrer' className='ml-2 text-blue-500 text-xs'>
                                                     Size Chart
                                                 </a>
                                             )}
