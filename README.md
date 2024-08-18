@@ -146,7 +146,7 @@ python manage.py runserver
 -   (🔵) POST /products/create/ - Creates a product
 -   (🔵) POST /products/edit/\<int:product_id\>/ - Edits a product with code id
 -   (🔵) POST /products/delete/\<int:product_id\>/ - Deletes a product with code id
--   (🔵) GET /scan_qr/ - Renders Scan QR code page template
+-   (🔵) GET /scan_qr/ - Renders Scan QR code page template 
 -   (🔵) POST /scan_qr/scan/ - Verify details and marked as delivered after successful scan
 -   (🔵) POST /export_csv/\<int:id\>/ - Exports a CSV file for given order item id
 
