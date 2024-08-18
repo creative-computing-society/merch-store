@@ -13,8 +13,8 @@ pipeline {
             steps {
                 script {
                     sh '''
-                    cd /home/ccs/merch-store
-                    docker compose up --build -d
+                    cd /home/ccs/merch-store/backend
+                    sudo docker compose up --build -d
                     '''
                 }
             }
