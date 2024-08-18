@@ -2,6 +2,13 @@ pipeline {
     agent any
 
     stages {
+        stage('Stash Local Changes') {
+            steps {
+                script {
+                    sh 'sudo -u ccs git -C /home/ccs/merch-store stash'
+                }
+            }
+        }
         stage('Pull Code') {
             steps {
                 script {
