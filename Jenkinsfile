@@ -5,8 +5,8 @@ pipeline {
         stage('Pull Code') {
             steps {
                 script {
-                    // Switch to the ccs user
-                    sh 'sudo su - ccs -c "cd /home/ccs/merch-store && git pull"'
+                    // Switch to ccs user and pull the latest code
+                    sh 'sudo -u ccs git -C /home/ccs/merch-store pull'
                 }
             }
         }
@@ -14,7 +14,7 @@ pipeline {
             steps {
                 script {
                     // Build and deploy using Docker Compose
-                    sh 'sudo docker compose up --build -d'
+                    sh 'docker compose up --build -d'
                 }
             }
         }
