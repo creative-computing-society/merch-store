@@ -27,4 +27,18 @@ pipeline {
             }
         }
     }
+
+     post {
+        success {
+            mail to: 'abakshi_be23+merch_store@thapar.edu',
+                 subject: "Pipeline Succeeded: ${currentBuild.fullDisplayName}",
+                 body: "The pipeline completed successfully.\n\nJob: ${env.JOB_NAME}\nBuild Number: ${env.BUILD_NUMBER}\nURL: ${env.BUILD_URL}"
+        }
+        failure {
+            mail to: 'abakshi_be23+merch_store@thapar.edu',
+                 subject: "Pipeline Failed: ${currentBuild.fullDisplayName}",
+                 body: "Something went wrong. Please check the Jenkins job for more details.\n\nJob: ${env.JOB_NAME}\nBuild Number: ${env.BUILD_NUMBER}\nURL: ${env.BUILD_URL}"
+        }
+
+    }
 }
