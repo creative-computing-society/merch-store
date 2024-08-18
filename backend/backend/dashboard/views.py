@@ -336,7 +336,7 @@ def successful_order_csv(request, id):
     if request.method == "GET":
         raise Http404
 
-    item = OrderItem.objects.filter(pk=id, order__is_verified=True).first()
+    item = OrderItem.objects.filter(product__pk=id, order__is_verified=True).first()
     if not item:
         raise Http404("OrderItem not found.")
 
