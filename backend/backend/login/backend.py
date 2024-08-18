@@ -28,6 +28,19 @@ class SSOAuthenticationBackend(BaseBackend):
         if user_info and not isinstance(user_info, Response):
             try:
                 user = User.objects.get(id=user_info["rollNo"])
+                roles = user_info.get("roles", [])
+                user_role = "user"
+                is_member = any(role["role"].lower() != "user" for role in roles)
+
+                for role in roles:
+                    if role["role"].lower() != "user":
+                        user_role = role["role"]
+                        break
+
+                user.is_member = is_member
+                user.position = user_role
+                user.save()
+
                 logger.debug(f"User with ID {user_info['rollNo']} found in database.")
             except User.DoesNotExist:
                 roles = user_info.get("roles", [])
