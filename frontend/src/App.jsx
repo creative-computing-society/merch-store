@@ -22,7 +22,7 @@ const App = () => {
   if (!authCtx.isAuthChecked) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader />;
+        <Loader />
       </div>
     );
   }

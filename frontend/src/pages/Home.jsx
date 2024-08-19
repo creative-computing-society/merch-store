@@ -30,23 +30,25 @@ const Home = ({ user }) => {
                 <hr className='my-2 border-2 rounded-lg ' />
                 <HomeTabs />
             </div>
-            <div id="prodCont" className='rounded-lg p-4 shadow-lg border-2 flex-1 bg-container overflow-auto md:h-[calc(100vh-10rem)] w-full'>
-                {loading ? <Loader /> : <div className='h-full'>
-                    {products.length === 0 && <div className='flex justify-center items-center h-full'>
+            <div id="prodCont" className='rounded-lg p-4 shadow-lg border-2 flex-1 bg-container overflow-auto h-[calc(100vh-10rem)] w-full'>
+                {loading ? <Loader /> : <>
+                    {products.length === 0 ? <div className='flex justify-center items-center h-[calc(100vh-45rem)] md:h-full'>
                         <p>No products to show!</p>
-                    </div>}
-                    <div className='grid md:grid-cols-3 gap-4 grid-cols-1 pb-4'>
-                        {products.map(product => (
-                            <Link to={`/product/${product.id}`} key={product.id} className='rounded-md p-4 border-2 bg-white flex flex-col hover:scale-105 transition-all'>
-                                <div className="w-full h-80 overflow-hidden flex items-center justify-center">
-                                    <img src={`${api_url}${product.image1}`} alt={product.name} className='w-full h-full object-contain border' />
-                                </div>
-                                <div className='text-xl mt-3'>{product.name}</div>
-                                <div className='font-bold'>₹{product.price}/-</div>
-                            </Link>
-                        ))}
                     </div>
-                </div>}
+                        :
+                        <div className='grid md:grid-cols-3 gap-4 grid-cols-1 pb-4'>
+                            {products.map(product => (
+                                <Link to={`/product/${product.id}`} key={product.id} className='rounded-md p-4 border-2 bg-white flex flex-col hover:scale-105 transition-all'>
+                                    <div className="w-full h-80 overflow-hidden flex items-center justify-center">
+                                        <img src={`${api_url}${product.image1}`} alt={product.name} className='w-full h-full object-contain border' />
+                                    </div>
+                                    <div className='text-xl mt-3'>{product.name}</div>
+                                    <div className='font-bold'>₹{product.price}/-</div>
+                                </Link>
+                            ))}
+                        </div>
+                    }
+                </>}
             </div>
         </div>
     );

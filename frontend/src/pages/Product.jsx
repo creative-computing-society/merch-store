@@ -165,56 +165,58 @@ const Product = () => {
 
                 }
             </div>
-            <div className='rounded-lg p-4 shadow-lg border-2 h-full flex-1 bg-container w-full'>
-                <div className='flex flex-col p-2 gap-8 h-full'>
+            <div className='rounded-lg p-4 shadow-lg border-2 md:h-full md:flex-1 bg-container w-full'>
+                <div className='flex flex-col justify-between p-2 gap-8 h-full'>
                     {loading ? <Loader /> :
                         <>
                             <div>
-                                <div className='text-3xl font-bold capitalize flex justify-between items-center'>
-                                    {product.name}
-                                    <div className='text-xl font-bold'>₹{product.price}</div>
+                                <div className='mb-8'>
+                                    <div className='text-3xl font-bold capitalize flex justify-between items-center'>
+                                        {product.name}
+                                        <div className='text-xl font-bold'>₹{product.price}</div>
+                                    </div>
+                                    <div className='text-l flex justify-between sm:items-center flex-col sm:flex-row'>
+                                        {product.description}
+                                        <div>Max Quantity: {product.max_quantity}</div>
+                                    </div>
                                 </div>
-                                <div className='text-l flex justify-between sm:items-center flex-col sm:flex-row'>
-                                    {product.description}
-                                    <div>Max Quantity: {product.max_quantity}</div>
+                                <div className='flex flex-col gap-2'>
+                                    {product.is_name_required && (
+                                        <div className='flex flex-col'>
+                                            <label htmlFor='name' className='text-l'>Printing Name:</label>
+                                            <input type='text' id='name' className='rounded-lg border-2 p-2' onChange={(e) => setName(e.target.value)} />
+                                        </div>
+                                    )}
+                                    {product.is_size_required && (
+                                        <div className='flex flex-col'>
+                                            <label htmlFor='size' className='text-l'>Size:
+                                                {product.size_chart_image && (
+                                                    <a href={"https://api.merch.ccstiet.com" + product.size_chart_image} target='_blank' rel='noreferrer' className='ml-2 text-blue-500 text-xs'>
+                                                        Size Chart
+                                                    </a>
+                                                )}
+                                            </label>
+                                            <select id='size' className='rounded-lg border-2 p-2' value={size} onChange={(e) => setSize(e.target.value)}>
+                                                <option>Select Size</option>
+                                                <option value='XS'>Extra Small</option>
+                                                <option value='S'>Small</option>
+                                                <option value='M'>Medium</option>
+                                                <option value='L'>Large</option>
+                                                <option value='XL'>Extra Large</option>
+                                                <option value='XXL'>2x Extra Large</option>
+                                                <option value='XXXL'>3x Extra Large</option>
+                                            </select>
+                                        </div>
+                                    )}
+                                    {product.is_image_required && (
+                                        <div className='flex flex-col'>
+                                            <label htmlFor='image' className='text-l'>Upload Image:</label>
+                                            <input type='file' id='image' className='rounded-lg border-2 p-2' onChange={onImageSelect} />
+                                        </div>
+                                    )}
                                 </div>
                             </div>
-                            <div className='flex flex-col gap-2'>
-                                {product.is_name_required && (
-                                    <div className='flex flex-col'>
-                                        <label htmlFor='name' className='text-l'>Printing Name:</label>
-                                        <input type='text' id='name' className='rounded-lg border-2 p-2' onChange={(e) => setName(e.target.value)} />
-                                    </div>
-                                )}
-                                {product.is_size_required && (
-                                    <div className='flex flex-col'>
-                                        <label htmlFor='size' className='text-l'>Size:
-                                            {product.size_chart_image && (
-                                                <a href={"https://api.merch.ccstiet.com"+product.size_chart_image} target='_blank' rel='noreferrer' className='ml-2 text-blue-500 text-xs'>
-                                                    Size Chart
-                                                </a>
-                                            )}
-                                        </label>
-                                        <select id='size' className='rounded-lg border-2 p-2' value={size} onChange={(e) => setSize(e.target.value)}>
-                                            <option>Select Size</option>
-                                            <option value='XS'>Extra Small</option>
-                                            <option value='S'>Small</option>
-                                            <option value='M'>Medium</option>
-                                            <option value='L'>Large</option>
-                                            <option value='XL'>Extra Large</option>
-                                            <option value='XXL'>2x Extra Large</option>
-                                            <option value='XXXL'>3x Extra Large</option>
-                                        </select>
-                                    </div>
-                                )}
-                                {product.is_image_required && (
-                                    <div className='flex flex-col'>
-                                        <label htmlFor='image' className='text-l'>Upload Image:</label>
-                                        <input type='file' id='image' className='rounded-lg border-2 p-2' onChange={onImageSelect} />
-                                    </div>
-                                )}
-                            </div>
-                            <div className='mt-auto flex items-center gap-4'>
+                            <div className='flex items-center gap-4'>
                                 <div className='flex items-center gap-2'>
                                     <button onClick={decreaseQuantity} className='rounded-lg border-2 p-2'>-</button>
                                     <input type='number' value={quantity} onChange={handleQuantityChange} className='rounded-lg border-2 p-2 w-16 text-center' min='1' max={product.max_quantity} />
