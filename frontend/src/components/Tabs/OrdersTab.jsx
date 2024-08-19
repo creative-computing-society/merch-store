@@ -3,6 +3,7 @@ import api from '../../helpers/AxiosClient';
 import Button from '../Button';
 import { faDownload, faQrcode, faX } from '@fortawesome/free-solid-svg-icons';
 import api_url from '../../helpers/Config';
+import QRPopup from '../QRPopup';
 
 
 export const OrdersTab = () => {
@@ -22,24 +23,6 @@ export const OrdersTab = () => {
     };
     return (
         <>
-            <div className={`${isModalVisible ? "flex" : "hidden"} fixed z-50 inset-0 bg-black bg-opacity-50 items-center justify-center`}>
-                <div className="bg-white p-8 rounded-lg w-96 m-8">
-                    <div className='flex justify-between items-center'>
-                        <h1 className="text-2xl font-bold">QR Code</h1>
-                        <Button icon={faX} onClick={() => setIsModalVisible(false)} className="text-2xl font-bold bg-transparent" />
-                    </div>
-                    <img src={`data:image/png;base64,${orderedItems.length > 0 ? orderedItems[orderIndex].qr_code_data : ''
-                        }`} className='w-full h-full' alt='QR Code' />
-                    <p>Please take a screenshot or download the QR code for future reference.</p>
-                    <Button className="px-4 py-2 mt-8 w-full" text="Download" icon={faDownload} onClick={() => {
-                        const link = document.createElement('a');
-                        link.href = `data:image/png;base64,${orderedItems.length > 0 ? orderedItems[orderIndex].qr_code_data : ''
-                            }`;
-                        link.download = 'qr_code.png';
-                        link.click();
-                    }} />
-                </div>
-            </div>
             <div className='flex flex-col h-full gap-4 justify-between'>
                 <div className='flex overflow-auto flex-col flex-1 basis-0 gap-4'>
                     {orderedItems.length > 0 ? orderedItems.map((order, index) => (
@@ -58,8 +41,7 @@ export const OrdersTab = () => {
                                         })
                                     }</div>
                                     <Button icon={faQrcode} isActive onClick={() => {
-                                        setOrderIndex(index);
-                                        setIsModalVisible(true);
+                                        QRPopup({ qrData: order.qr_code_data });
                                     }} />
                                 </div>
                             </div>

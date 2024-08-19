@@ -4,6 +4,7 @@ import Button from '../Button';
 import { faCartArrowDown, faMoneyBill } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 import api_url from '../../helpers/Config';
+import confirmPopup from '../ConfirmPopup';
 
 const CartTab = () => {
     const [cartProducts, setCartProducts] = useState([]);
@@ -31,7 +32,11 @@ const CartTab = () => {
                 if (product.quantity < product.product.max_quantity) {
                     return { ...product, quantity: product.quantity + 1 };
                 } else {
-                    alert(`Maximum quantity (${product.product.max_quantity}) reached for ${product.product.name}`);
+                    confirmPopup({
+                        title: 'Max quantity reached',
+                        message: `You can only add up to ${product.product.max_quantity} ${product.product.name} to your cart`,
+                        isNoRequired: false,
+                    });
                     return product;
                 }
             }
@@ -42,16 +47,21 @@ const CartTab = () => {
 
     const decreaseQuantity = (productId, currentQuantity) => {
         if (currentQuantity === 1) {
-            if (window.confirm(`Are you sure you want to remove ${cartProducts.find(product => product.id === productId)?.product.name} from your cart?`)) {
-                setIsUpdating(true);
-                api.post('/cart/delete/', { cart_item_id: productId })
-                    .then(() => {
-                        fetchCartItems();
-                    }).catch(error => {
-                    }).finally(() => {
-                        setIsUpdating(false);
-                    });
-            }
+            confirmPopup({
+                title: 'Remove from cart',
+                message: `Are you sure you want to remove ${cartProducts.find(product => product.id === productId)?.product.name} from your cart?`,
+                onConfirm: () => {
+                    setIsUpdating(true);
+                    api.post('/cart/delete/', { cart_item_id: productId })
+                        .then(() => {
+                            fetchCartItems();
+                        }).catch(error => {
+                        }).finally(() => {
+                            setIsUpdating(false);
+                        });
+                },
+                onCancel: () => { }
+            });
         } else {
             const updatedCart = cartProducts.map(product => {
                 if (product.id === productId) {

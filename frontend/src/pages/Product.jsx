@@ -6,6 +6,7 @@ import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import { Button, Loader } from '../components';
 import { faCartPlus } from '@fortawesome/free-solid-svg-icons';
 import api_url from '../helpers/Config';
+import confirmPopup from '../components/ConfirmPopup';
 
 const Product = () => {
     const [loading, setLoading] = useState(true);
@@ -26,7 +27,11 @@ const Product = () => {
 
     const onImageSelect = (e) => {
         if (e.target.files[0].size > 15000000) {
-            alert("File size should be below 15MB!");
+            confirmPopup({
+                title: 'Image size too large',
+                message: 'Please upload an image less than 15MB in size',
+                isNoRequired: false,
+            });
             setImage(null);
         } else {
             setImage(e.target.files[0]);
@@ -63,17 +68,29 @@ const Product = () => {
         }
 
         if (product.is_name_required && !name) {
-            alert('Name is required');
+            confirmPopup({
+                title: 'Name is required',
+                message: 'Please enter your name to proceed',
+                isNoRequired: false,
+            });
             return;
         }
 
         if (product.is_size_required && !size) {
-            alert('Size is required');
+            confirmPopup({
+                title: 'Size is required',
+                message: 'Please select a size to proceed',
+                isNoRequired: false,
+            });
             return;
         }
 
         if (product.is_image_required && !image) {
-            alert('Image is required');
+            confirmPopup({
+                title: 'Image is required',
+                message: 'Please upload an image to proceed',
+                isNoRequired: false,
+            });
             return;
         }
 
@@ -82,7 +99,11 @@ const Product = () => {
             try {
                 imageUrl = await uploadImage();
             } catch (error) {
-                alert('Image upload failed');
+                confirmPopup({
+                    title: 'Image upload failed',
+                    message: 'An error occured while uploading the image. Please try again later.',
+                    isNoRequired: false,
+                });
                 return;
             }
         }
@@ -96,12 +117,22 @@ const Product = () => {
                 quantity: quantity
             });
 
-            alert('Product added to cart');
+            confirmPopup({
+                title: 'Product added to cart',
+                message: `${product.name} added to cart successfully`,
+                isNoRequired: false,
+                onConfirm: () => {
+                    navigate('/cart');
+                }
+            });
             setButtonText('Already in cart');
-            navigate('/');
         } catch (error) {
             if (error.response && error.response.status === 400) {
-                alert('Product already in cart or quantity limit exceeded');
+                confirmPopup({
+                    title: 'Product already in cart',
+                    message: `${product.name} is already in your cart. You can update the quantity from the cart page.`,
+                    isNoRequired: false,
+                });
             }
         } finally {
             setDisabled(true);

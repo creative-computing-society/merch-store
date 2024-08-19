@@ -5,9 +5,10 @@ import { faGift, faMoneyBill, faRemove } from '@fortawesome/free-solid-svg-icons
 import { Link, redirect } from 'react-router-dom';
 import api_url from '../helpers/Config';
 import { load } from "@cashfreepayments/cashfree-js";
+import confirmPopup from '../components/ConfirmPopup';
 
 
-  
+
 
 
 const Checkout = () => {
@@ -71,11 +72,11 @@ const Checkout = () => {
     };
 
     let cashfree;
-    var initializeSDK = async function () {          
+    var initializeSDK = async function () {
         cashfree = await load({
             mode: "production"
         });
-    }
+    };
     initializeSDK();
 
     const doPayment = async (session) => {
@@ -85,7 +86,7 @@ const Checkout = () => {
         };
         cashfree.checkout(checkoutOptions);
     };
-  
+
     const handlePayment = (e) => {
         e.preventDefault();
         setDisabled(true);
@@ -103,7 +104,11 @@ const Checkout = () => {
                     doPayment(response.payment_session_id);
                 });
             }).catch(error => {
-                alert('Something went wrong! Please try again later.');
+                confirmPopup({
+                    title: 'Error occured',
+                    message: 'An error occured while processing your order. Please try again later.',
+                    isNoRequired: false,
+                });
             });
     };
 
@@ -151,9 +156,9 @@ const Checkout = () => {
                                 <span className='font-bold'>₹{parseFloat(cartAmt.updated_amount).toFixed(2)}</span>
                             </div>
                         </div>
-                          <Button type="submit" disabled={disabled} className='px-4 py-2 mt-4 w-full' icon={faMoneyBill} onClick={handlePayment} isActive text="Pay Now" />
+                        <Button type="submit" disabled={disabled} className='px-4 py-2 mt-4 w-full' icon={faMoneyBill} onClick={handlePayment} isActive text="Pay Now" />
 
-                     
+
                     </div>
                 </div>
 
