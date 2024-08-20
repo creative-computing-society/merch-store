@@ -52,7 +52,7 @@ export const OrdersTab = () => {
                                             {/* <img src='https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/991px-Placeholder_view_vector.svg.png' alt={item.product.name} className='w-16 h-auto rounded-md' /> */}
                                             <img src={`${api_url}${item.product.image1}`} alt={item.product.name} className='w-1/3 h-auto rounded-md object-contain' />
                                             <div>{item.product.name}</div>
-                                            <div>{item.quantity} x {item.product.price}</div>
+                                            <div className='font-bold'>{item.quantity} x INR {item.product.price}/-</div>
                                         </div>
                                         <div className='p-2 rounded-b-lg text-xs'>
                                             <div>Printing Name: <span className='font-bold'>{item.printing_name}</span></div>

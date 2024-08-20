@@ -204,7 +204,7 @@ const Product = () => {
                                 <div className='mb-8'>
                                     <div className='text-3xl font-bold capitalize flex justify-between items-center'>
                                         {product.name}
-                                        <div className='text-xl font-bold'>₹{product.price}</div>
+                                        <div className='text-xl font-bold'>INR {product.price}/-</div>
                                     </div>
                                     <div className='text-l flex justify-between sm:items-center flex-col sm:flex-row'>
                                         {product.description}

@@ -93,7 +93,7 @@ const CartTab = () => {
                             <img src={`${api_url}${product.product.image1}`} alt={product.product.name} className='w-1/3 h-auto rounded-md object-contain' />
                             <div>
                                 <p>{product.product.name}</p>
-                                <p className='font-bold'>₹{product.product.price}</p>
+                                <p className='font-bold'>INR {product.product.price}/-</p>
                             </div>
                             <div className='flex justify-center items-center'>
                                 <div className='flex items-center'>
@@ -130,7 +130,7 @@ const CartTab = () => {
                     <div className='flex flex-col'>
                         <div className='flex justify-between'>
                             <span>Subtotal:</span>
-                            <span className='font-bold'>₹{cartAmt}</span>
+                            <span className='font-bold'>INR {cartAmt}/-</span>
                         </div>
                     </div>
                     <Link to='/checkout'>

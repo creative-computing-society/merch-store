@@ -77,7 +77,7 @@ const PaymentStatus = () => {
                                     <span className='font-bold'>Payment Gateway ID:</span> {paymentDetails.payment_id}
                                 </div>
                                 <div>
-                                    <span className='font-bold'>Paid Amount:</span> ₹{paymentDetails.paid_amount}
+                                    <span className='font-bold'>Paid Amount:</span> INR {paymentDetails.paid_amount}/-
                                 </div>
                                 <div>
                                     <span className='font-bold'>Payment Status:</span> {paymentDetails.reason}

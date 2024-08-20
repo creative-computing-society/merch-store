@@ -145,15 +145,15 @@ const Checkout = () => {
                         <div className='flex flex-col'>
                             <div className='flex justify-between'>
                                 <span>Total Amount:</span>
-                                <span className='font-bold'>₹{parseFloat(cartAmt.total_amount).toFixed(2)}</span>
+                                <span className='font-bold'>INR {parseFloat(cartAmt.total_amount).toFixed(2)}/-</span>
                             </div>
                             <div className='flex justify-between'>
                                 <span>Discount:</span>
                                 <span className='font-bold'>{cartAmt.discount_percentage}%</span>
                             </div>
                             <div className='flex justify-between'>
-                                <span>Subtotal: {cartAmt.updated_amount === 1.00 && <p className='inline-block text-xs'>Minimum transaction fee is ₹1.00</p>}</span>
-                                <span className='font-bold'>₹{parseFloat(cartAmt.updated_amount).toFixed(2)}</span>
+                                <span>Subtotal: {cartAmt.updated_amount === 1.00 && <p className='inline-block text-xs'>Minimum transaction fee is INR 1.00/-</p>}</span>
+                                <span className='font-bold'>INR {parseFloat(cartAmt.updated_amount).toFixed(2)}/-</span>
                             </div>
                         </div>
                         <Button type="submit" disabled={disabled} className='px-4 py-2 mt-4 w-full' icon={faMoneyBill} onClick={handlePayment} isActive text="Pay Now" />
@@ -172,8 +172,8 @@ const Checkout = () => {
                                 <img src={`${api_url}${product.product.image1}`} alt={product.product.name} className='w-1/3 md:w-1/5 h-auto rounded-md object-contain' />
                                 <p>{product.product.name}</p>
                                 <p className='font-bold flex flex-col items-center'>
-                                    ₹{parseFloat(product.product.price * product.quantity).toFixed(2)}
-                                    <span className='text-xs text-gray-500'>₹{product.product.price} x {product.quantity}</span>
+                                    INR {parseFloat(product.product.price * product.quantity).toFixed(2)}/-
+                                    <span className='text-xs text-gray-500'>INR {product.product.price} x {product.quantity}/-</span>
                                 </p>
                             </div>
                             <div className='p-2 rounded-b-lg text-xs'>

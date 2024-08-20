@@ -43,7 +43,7 @@ const Home = ({ user }) => {
                                         <img src={`${api_url}${product.image1}`} alt={product.name} className='w-full h-full object-contain border' />
                                     </div>
                                     <div className='text-xl mt-3'>{product.name}</div>
-                                    <div className='font-bold'>₹{product.price}/-</div>
+                                    <div className='font-bold'>INR {product.price}/-</div>
                                 </Link>
                             ))}
                         </div>
