@@ -336,27 +336,28 @@ def successful_order_csv(request, id):
     if request.method == "GET":
         raise Http404
 
-    item = OrderItem.objects.filter(product__pk=id, order__is_verified=True).first()
-    if not item:
+    items = OrderItem.objects.filter(product__pk=id, order__is_verified=True)
+    if not items:
         raise Http404("OrderItem not found.")
 
     first_row = ["Name", "Email Id", "Phone Number", "Position", "Quantity"]
     rows = [first_row]
 
-    user = item.order.user
-    row = [user.name, user.email, user.phone_no, user.position, item.quantity]
+    for item in items:
+        user = item.order.user
+        row = [user.name, user.email, user.phone_no, user.position, item.quantity]
 
-    if item.product.is_size_required:
-        first_row.append("Size")
-        row.append(item.size)
-    if item.product.is_name_required:
-        first_row.append("Printing Name")
-        row.append(item.printing_name)
-    if item.product.is_image_required:
-        first_row.append("Image URL")
-        row.append(item.image_url)
+        if item.product.is_size_required:
+            first_row.append("Size")
+            row.append(item.size)
+        if item.product.is_name_required:
+            first_row.append("Printing Name")
+            row.append(item.printing_name)
+        if item.product.is_image_required:
+            first_row.append("Image URL")
+            row.append(item.image_url)
 
-    rows.append(row)
+        rows.append(row)
 
     pseudo_buffers = Echo()
     writer = csv.writer(pseudo_buffers)
