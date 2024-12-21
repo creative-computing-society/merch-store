@@ -69,6 +69,16 @@ const Navbar = () => {
                                     </li>
                                 )
                             }
+                            {
+                                !authCtx.isLoggedIn && (
+                                    <li
+                                        className="px-4 py-2 hover:bg-primaryHover hover:rounded-md cursor-pointer"
+                                        onClick={() => navigate('/login')}
+                                    >
+                                        Login
+                                    </li>
+                                )
+                            }
                             <li
                                 className="px-4 py-2 hover:bg-primaryHover hover:rounded-md cursor-pointer"
                                 onClick={handlePolicies}
@@ -81,6 +91,7 @@ const Navbar = () => {
                             >
                                 Help
                             </li>
+
                         </ul>
                     </div>
                 )}

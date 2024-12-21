@@ -39,7 +39,7 @@ const App = () => {
           <Route
             path="/product/:id"
             element={
-              authCtx.isLoggedIn ? <Product /> : <Navigate to="/login" />
+              <Product />
             }
           />
           <Route
@@ -52,14 +52,12 @@ const App = () => {
           <Route
             path="/"
             element={
-              authCtx.isLoggedIn ? (
-                <Home user={authCtx.user} />
-              ) : (
-                <Navigate to="/login" />
-              )
+              <Home user={
+                authCtx.isLoggedIn ? authCtx.user : null
+              } />
             }
           />
-          <Route path="*" element={<Navigate to="/login" />} />
+          <Route path="*" element={<Navigate to="/" />} />
           <Route path="/authVerify" element={<AuthVerify />} />
           <Route
             path="/payment-status/:txnid"

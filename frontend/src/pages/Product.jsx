@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../helpers/AxiosClient';
 import { Carousel } from 'react-responsive-carousel';
@@ -7,8 +7,10 @@ import { Button, Loader } from '../components';
 import { faCartPlus } from '@fortawesome/free-solid-svg-icons';
 import api_url from '../helpers/Config';
 import confirmPopup from '../components/ConfirmPopup';
+import AuthContext from '../helpers/AuthContext';
 
 const Product = () => {
+    const { isLoggedIn } = useContext(AuthContext);
     const [loading, setLoading] = useState(true);
     const [product, setProduct] = useState({});
     const productId = useParams().id;
@@ -24,6 +26,13 @@ const Product = () => {
 
     const [uploadedImageUrl, setUploadedImageUrl] = useState('');
     const [isUploading, setIsUploading] = useState(false); // New state variable
+
+    useEffect(() => {
+        if (!isLoggedIn) {
+            setDisabled(true);
+            setButtonText('Login to add to cart');
+        }
+    }, [isLoggedIn]);
 
     const onImageSelect = (e) => {
         if (e.target.files[0].size > 15000000) {
@@ -150,7 +159,7 @@ const Product = () => {
                         setButtonText('Already in cart');
                     } else {
                         setDisabled(true);
-                        setButtonText('Out of stock');
+                        setButtonText('Out of stock or viewing as guest');
                     }
                 }
             });

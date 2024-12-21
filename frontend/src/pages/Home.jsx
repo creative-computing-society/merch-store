@@ -25,7 +25,8 @@ const Home = ({ user }) => {
                 <div className='text-3xl font-bold capitalize'>
                     Hello,
                     <br />
-                    {user.name.split(' ')[0].toLowerCase()}!
+                    {user == null ? 'Guest' : user.name.split(' ')[0].toLowerCase()}!
+
                 </div>
                 <hr className='my-2 border-2 rounded-lg ' />
                 <HomeTabs />

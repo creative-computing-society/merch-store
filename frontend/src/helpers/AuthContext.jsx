@@ -6,7 +6,7 @@ const AuthContext = React.createContext({
     isCCSMember: false,
     login: (data) => { },
     logout: () => { },
-    user: {},
+    user: null,
 });
 
 export const AuthContextProvider = (props) => {
