@@ -23,10 +23,8 @@ const Policies = () => {
                 <p>You may contact us using the information below:</p>
                 <br />
                 <p><b>Merchant Legal Entity Name:</b> AKARSH SRIVASTAVA</p>
-                <p><b>Registered Address:</b> Thapar Institute of Engineering and Technology, Patiala, Punjab, PIN: 147004</p>
-                <p><b>Operational Address:</b> Thapar Institute of Engineering and Technology, Patiala, Punjab, PIN: 147004</p>
-                <p><b>Telephone No:</b> 8920455673</p>
-                <p><b>E-Mail ID:</b> <a href="mailto:pagarwal_be22@thapar.edu">pagarwal_be22@thapar.edu</a></p>
+                <p><b>Telephone No:</b> +91 9305267844</p>
+                <p><b>E-Mail ID:</b> <a href="mailto:akarsh91140@gmail.com">akarsh91140@gmail.com</a></p>
             </>
         },
         {
