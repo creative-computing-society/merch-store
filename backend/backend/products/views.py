@@ -7,17 +7,21 @@ from .models import Product, CartItem
 from order.models import OrderItem
 from .serializers import ProductSerializer, CartItemSerializer
 
+
 class AllProductsView(APIView):
-    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         user = request.user
-        user_position = user.position
-
-        # Filter products based on the user's position
-        queryset = Product.objects.filter(
-            for_user_positions__contains=[user_position], is_visible=True
-        )
+        if not user.is_authenticated:
+            queryset = Product.objects.filter(
+                for_user_positions__contains=["user"]
+            ).filter(is_visible=True)
+        else:
+            user_position = user.position
+            # Filter products based on the user's position
+            queryset = Product.objects.filter(
+                for_user_positions__contains=[user_position], is_visible=True
+            )
         serializer = ProductSerializer(queryset, many=True, context={"user": user})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -25,7 +29,10 @@ class AllProductsView(APIView):
 class ProductView(APIView):
     def get(self, request, product_id):
         user = request.user
-        user_position = user.position
+        if not user.is_authenticated:
+            user_position = "user"
+        else:
+            user_position = user.position
 
         product = Product.objects.filter(id=product_id).first()
         if (
