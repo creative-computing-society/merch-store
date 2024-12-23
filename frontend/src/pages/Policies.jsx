@@ -5,17 +5,14 @@ const Policies = () => {
     const policies = [
         {
             title: 'About Us',
-            content: <><p>Welcome to the official merchandise store of the <b><u>Creative Computing Society (CCS)</u></b> at Thapar Institute of Engineering and Technology (TIET), Patiala. Our store is a dedicated platform where the vibrant student community of TIET can access a range of high-quality and exclusive merchandise that reflects the spirit and values of our esteemed society.</p>
+            content: <>
+                <p>This website represents more than just a shopping destination; it is a gateway to connecting with the essence of . It is a reflection of our shared values and a testament to our dedication to excellence and creativity. Whether you are a current student, an alumnus, or an enthusiastic supporter of our mission, we believe our merchandise offers something that will resonate with you and enhance your connection to our community.</p>
                 <br />
-                <p>At the Creative Computing Society, we hold creativity, innovation, and community in the highest regard. Our collection is meticulously curated to embody these principles, offering products that go beyond mere clothing or accessories. Each item is crafted to serve as a proud symbol of our collective identity and unwavering commitment to the fields of computing and technology. Our designs are inspired by the dynamic culture of TIET and the innovative spirit of our society, ensuring that every product resonates deeply with our members and supporters.</p>
-                <br />
-                <p>This website represents more than just a shopping destination; it is a gateway to connecting with the essence of CCS. It is a reflection of our shared values and a testament to our dedication to excellence and creativity. Whether you are a current student, an alumnus, or an enthusiastic supporter of our mission, we believe our merchandise offers something that will resonate with you and enhance your connection to our community.</p>
-                <br />
-                <p>Our store is managed with great care and attention to detail to provide you with a seamless and enjoyable shopping experience. The website is operated and overseen by <b>Akarsh Srivastava</b>, the General Secretary of the Creative Computing Society. Akarsh, along with our dedicated team, is committed to upholding the highest standards of quality and service. We strive to ensure that every interaction with our store is smooth, pleasant, and meets your expectations.</p>
+                <p>Our store is managed with great care and attention to detail to provide you with a seamless and enjoyable shopping experience. The website is operated and overseen by <b>Akarsh Srivastava</b>. Akarsh, along with our dedicated team, is committed to upholding the highest standards of quality and service. We strive to ensure that every interaction with our store is smooth, pleasant, and meets your expectations.</p>
                 <br />
                 <p>Should you have any questions, feedback, or require support, please do not hesitate to reach out to us. We are here to assist you and ensure that your experience with us is both positive and fulfilling.</p>
                 <br />
-                <p>We extend our heartfelt thanks to you for supporting the Creative Computing Society and being an integral part of our journey. Together, we strive to push the boundaries of innovation and creativity. Your support helps us continue our mission and make a positive impact within our community.</p></>
+                <p>We extend our heartfelt thanks to you for supporting us and being an integral part of our journey. Together, we strive to push the boundaries of innovation and creativity. Your support helps us continue our mission and make a positive impact within our community.</p></>
         },
         {
             title: 'Contact Details',
@@ -106,7 +103,7 @@ const Policies = () => {
                 <p>Once an order has been placed and confirmed on our website, it cannot be canceled. We prioritize prompt processing and fulfillment of orders to ensure timely delivery. To avoid any inconvenience, we strongly advise you to review all order details, including product selection and shipping information, before finalizing your purchase. If you have any doubts or concerns, please address them before placing your order.</p>
 
                 <h2><b><u>No Refund Policy</u></b></h2>
-                <p>We do not offer refunds for any products purchased from the CCS Merch Store. Our no refund policy is in place because each item is custom-made to order. We are committed to maintaining the highest standards of quality and craftsmanship for all our products. Once an order is confirmed, we proceed with manufacturing and preparing your item specifically to your request, making it non-returnable and non-refundable.</p>
+                <p>We do not offer refunds for any products purchased from the  Merch Store. Our no refund policy is in place because each item is custom-made to order. We are committed to maintaining the highest standards of quality and craftsmanship for all our products. Once an order is confirmed, we proceed with manufacturing and preparing your item specifically to your request, making it non-returnable and non-refundable.</p>
                 <br />
                 <p>We appreciate your understanding and cooperation regarding these policies. Our goal is to provide you with an exceptional shopping experience and high-quality merchandise. Should you have any questions or need further clarification, please do not hesitate to contact us.</p>
             </>
@@ -115,7 +112,7 @@ const Policies = () => {
         {
             title: 'Privacy Policy',
             content: <>
-                <p>At Creative Computing Society (CCS), we value your privacy and are committed to protecting your personal information. This Privacy Policy outlines how we collect, use, and safeguard your data when you visit our website, make a purchase, or interact with us. By using our website, you consent to the practices described in this policy.</p>
+                <p>We value your privacy and are committed to protecting your personal information. This Privacy Policy outlines how we collect, use, and safeguard your data when you visit our website, make a purchase, or interact with us. By using our website, you consent to the practices described in this policy.</p>
 
                 <h2><b><u>1. Information We Collect</u></b></h2>
                 <p>When you engage with our website, whether by making a purchase, logging in, or contacting us, we may collect certain personal information from you. The types of information we collect include:</p>
@@ -161,9 +158,9 @@ const Policies = () => {
                 <p>We may update this Privacy Policy from time to time to reflect changes in our practices or legal requirements. Any modifications will be posted on this page with an updated effective date. We encourage you to review this policy periodically to stay informed about how we are protecting your information.</p>
 
                 <h2><b><u>8. Contact Us</u></b></h2>
-                <p>If you have any questions, concerns, or requests regarding this Privacy Policy or how we handle your personal information, please contact us at: <a href="mailto:ccs@thapar.edu"><b><u>ccs@thapar.edu</u></b></a></p>
+                <p>If you have any questions, concerns, or requests regarding this Privacy Policy or how we handle your personal information, please contact us at: <a href="mailto:@thapar.edu"><b><u>@thapar.edu</u></b></a></p>
                 <br />
-                <p>Thank you for trusting Creative Computing Society with your personal information. We are committed to safeguarding your privacy and ensuring a secure and enjoyable experience on our website.</p>
+                <p>Thank you for trusting us with your personal information. We are committed to safeguarding your privacy and ensuring a secure and enjoyable experience on our website.</p>
             </>
 
         },
