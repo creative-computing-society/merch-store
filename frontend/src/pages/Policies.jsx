@@ -25,6 +25,7 @@ const Policies = () => {
                 <p><b>Merchant Legal Entity Name:</b> AKARSH SRIVASTAVA</p>
                 <p><b>Telephone No:</b> +91 9305267844</p>
                 <p><b>E-Mail ID:</b> <a href="mailto:akarsh91140@gmail.com">akarsh91140@gmail.com</a></p>
+                <p><b>Address:</b> Thapar Institute of Engineering and Technology, Patiala, Punjab - 147004</p>
             </>
         },
         {
@@ -85,7 +86,7 @@ const Policies = () => {
             title: 'Shipping Policy',
             content: <>
                 <p><b><u>Shipping Method:</u></b><br />
-                    We offer a convenient collection service for your orders. All products can be picked up from a designated area within the TIET campus. Once your order is confirmed, you will receive a QR code via email and in your order section on the website. This QR code will be required for collecting your items at the pickup location. Please ensure you have the QR code ready when you arrive.</p>
+                    We offer a convenient collection service for your orders. All products can be picked up from a designated area within the TIET campus. Once your order is confirmed, you will receive a QR code via email and in your order section on the website. This QR code will be required for collecting your items at the pickup location. Please ensure you have the QR code ready when you arrive. Orders will be delivered within 14 days of confirmation.</p>
 
                 <p><b><u>Shipping Charges:</u></b><br />
                     The price of your order includes all applicable shipping charges. There are no additional fees for delivery, as all costs are included in the total order amount.</p>
