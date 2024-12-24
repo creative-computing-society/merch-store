@@ -17,6 +17,7 @@ from .serializers import OrderSerializer, PaymentSerializer
 from .utils import generate_qr_code
 from discounts.models import DiscountCode
 from products.models import CartItem
+from requests.exceptions import HTTPError
 
 from .tasks import send_order_success_email_async
 from datetime import datetime, timedelta
@@ -24,8 +25,8 @@ import pytz
 import random
 
 # Test keys
-merchant_id = "PGTESTPAYUAT"
-salt_key = "099eb0cd-02cf-4e2a-8aca-3e6c6aff0399"
+merchant_id = "PGTESTPAYUAT86"
+salt_key = "96434309-7796-489d-8924-ab56988a6076"
 salt_index = 1
 env = "UAT"  # Change to "PROD" when you go live
 
@@ -35,11 +36,11 @@ BASE_URLS = {
     "PROD": "https://api.phonepe.com/apis/hermes"
 }
 
-def generate_phonepe_signature(payload, salt_key, endpoint):
-    data = json.dumps(payload)
-    base64_data = base64.b64encode(data.encode('utf-8')).decode('utf-8')
-    signature_string = base64_data + endpoint + salt_key
-    return hashlib.sha256(signature_string.encode('utf-8')).hexdigest()
+# def generate_phonepe_signature(payload, salt_key, endpoint):
+#     data = json.dumps(payload)
+#     base64_data = base64.b64encode(data.encode('utf-8')).decode('utf-8')
+#     signature_string = base64_data + endpoint + salt_key
+#     return hashlib.sha256(signature_string.encode('utf-8')).hexdigest()
 
 class AllOrders(APIView):
     permission_classes = [IsAuthenticated]
@@ -211,7 +212,6 @@ class Checkout(APIView):
             status=status.HTTP_201_CREATED,
         )
 
-
 class PaymentView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -226,7 +226,7 @@ class PaymentView(APIView):
 
         unique_transaction_id = str(order.id) + str(int(time.time() * 1000))
         ui_redirect_url = "http://localhost:3000/payment-status/"
-        s2s_callback_url = "http://localhost:8000/payment/callback/"
+        s2s_callback_url = "http://localhost:3377/payment/callback/"
         amount = int(order.updated_amount * 100)
         id_assigned_to_user_by_merchant = user.id
 
@@ -243,33 +243,57 @@ class PaymentView(APIView):
             }
         }
 
+        json_payload = json.dumps(payload)
+        base64_payload = base64.b64encode(json_payload.encode('utf-8')).decode('utf-8')
+
         endpoint = "/pg/v1/pay"
-        signature = generate_phonepe_signature(payload, salt_key, endpoint)
+        signature_string = base64_payload + endpoint + salt_key
+        checksum = hashlib.sha256(signature_string.encode('utf-8')).hexdigest()
+        x_verify = f"{checksum}###{salt_index}"
+
         headers = {
             "Content-Type": "application/json",
-            "X-VERIFY": f"{signature}###{salt_index}"
+            "X-VERIFY": x_verify
         }
 
         base_url = BASE_URLS[env]
-        response = requests.post(
-            f"{base_url}{endpoint}",
-            json=payload,
-            headers=headers
-        )
+        max_retries = 5
+        retry_delay = 1  # Initial delay in seconds
 
-        # Log the payload and response for debugging
-        print("Payload:", payload)
-        print("Response Status Code:", response.status_code)
-        print("Response Content:", response.content)
-
-        if response.status_code == 200:
-            return Response(response.json(), status=status.HTTP_200_OK)
-        else:
-            return Response(
-                {"detail": "Payment initiation failed."},
-                status=status.HTTP_400_BAD_REQUEST
+        for attempt in range(max_retries):
+            response = requests.post(
+                f"{base_url}{endpoint}",
+                json={"request": base64_payload},
+                headers=headers
             )
-            
+
+            # Log the payload and response for debugging
+            print("Payload:", payload)
+            print("Base64 Payload:", base64_payload)
+            print("X-VERIFY Header:", x_verify)
+            print("Response Status Code:", response.status_code)
+            print("Response Content:", response.content)
+
+            if response.status_code == 200:
+                pay_page_url = response.json().get("data", {}).get("instrumentResponse", {}).get("redirectInfo", {}).get("url")
+                Payment.objects.create(
+                    order=order,
+                    transaction_id=unique_transaction_id,
+                    paid_amount=order.updated_amount,
+                    status="pending",
+                )
+                return Response({"pay_page_url": pay_page_url}, status=status.HTTP_200_OK)
+            elif response.status_code == 429:
+                # Too many requests, wait and retry
+                time.sleep(retry_delay)
+                retry_delay *= 2  # Exponential backoff
+            else:
+                break
+
+        return Response(
+            {"detail": "Payment initiation failed."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
             
 
 # class PaymentSuccessView(APIView):
@@ -400,9 +424,16 @@ class PhonePeCallbackView(APIView):
             base64_response = request.data.get("response")
             x_verify = request.headers.get("X-VERIFY")
 
+            # Log the callback request for debugging
+            print("Callback Base64 Response:", base64_response)
+            print("Callback X-VERIFY Header:", x_verify)
+
             # Decode the base64 response
             decoded_response = base64.b64decode(base64_response).decode('utf-8')
             response_data = json.loads(decoded_response)
+
+            # Log the decoded response for debugging
+            print("Decoded Callback Response:", response_data)
 
             # Validate the checksum
             calculated_checksum = hashlib.sha256((base64_response + salt_key).encode('utf-8')).hexdigest()
@@ -437,4 +468,6 @@ class PhonePeCallbackView(APIView):
                 return Response({"detail": "Payment record not found."}, status=status.HTTP_404_NOT_FOUND)
 
         except Exception as e:
+            # Log the exception for debugging
+            print("Exception in PhonePeCallbackView:", str(e))
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)

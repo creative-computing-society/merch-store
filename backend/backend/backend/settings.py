@@ -157,12 +157,14 @@ CORS_ALLOWED_ORIGINS = [
     "https://merch.ccstiet.com",
     "https://api.merch.ccstiet.com",
     "http://localhost:3000",
+    "http://localhost:3377",
 ]
 CORS_ALLOW_HEADERS = ["*"]
 CSRF_TRUSTED_ORIGINS = [
     "https://merch.ccstiet.com",
     "https://api.merch.ccstiet.com",
     "http://localhost:3000",
+    "http://localhost:3377",
 ]
 
 PAYU_MERCHANT_KEY = os.getenv("PAYU_MERCHANT_KEY")
