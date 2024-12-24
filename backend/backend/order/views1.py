@@ -34,6 +34,7 @@ phonepe_client = PhonePePaymentClient(
     merchant_id=merchant_id, salt_key=salt_key, salt_index=salt_index, env=env
 )
 
+
 def generateHash(params, salt):
     hashString = (
         params["key"]
@@ -248,7 +249,8 @@ class PaymentView(APIView):
 
         unique_transaction_id = str(order.id) + str(int(time.time() * 1000))
         ui_redirect_url = "http://localhost:3000/payment-status/"
-        s2s_callback_url = "http://localhost:8000/payment/verify/"
+        # s2s_callback_url = "http://localhost:8000/payment/verify/"
+        s2s_callback_url = "https://webhook-test.com/b1c68c90f5a5d25053aba8385b17a0d8"
         amount = int(order.updated_amount * 100)
         id_assigned_to_user_by_merchant = user.id
 
@@ -268,11 +270,25 @@ class PaymentView(APIView):
             paid_amount=order.updated_amount,
             status="pending",
         )
-        # Assuming you have the x_verify and response data from the callback
-        x_verify = request.headers.get('x-verify')
-        response_data = request.body.decode('utf-8')
-        phonepe_client.verify_response(x_verify=x_verify, response=response_data)
-        return Response({"pay_page_url": pay_page_url}, status=status.HTTP_200_OK)
+        transaction_status_response = phonepe_client.check_status(
+            merchant_transaction_id=unique_transaction_id
+        )
+        transaction_state = transaction_status_response.data.state
+        print(
+            {
+                "pay_page_url": pay_page_url,
+                "transaction_id": unique_transaction_id,
+                "transaction_state": transaction_state,
+            }
+        )
+        return Response(
+            {
+                "pay_page_url": pay_page_url,
+                "transaction_id": unique_transaction_id,
+                "transaction_state": transaction_state,
+            },
+            status=status.HTTP_200_OK,
+        )
 
 
 class PaymentSuccessView(APIView):

@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = os.getenv("DEBUG")
-ALLOWED_HOSTS = ["api.merch.ccstiet.com", "127.0.0.1", "localhost", "192.168.1.39"]
+ALLOWED_HOSTS = ["api.merch.ccstiet.com", "127.0.0.1", "localhost", "192.168.1.39", "af99-2405-201-4013-f128-74e4-b4d8-e225-704d.ngrok-free.app"]
 
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 
@@ -158,6 +158,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://api.merch.ccstiet.com",
     "http://localhost:3000",
     "http://localhost:3377",
+    "https://af99-2405-201-4013-f128-74e4-b4d8-e225-704d.ngrok-free.app"
 ]
 CORS_ALLOW_HEADERS = ["*"]
 CSRF_TRUSTED_ORIGINS = [
@@ -165,6 +166,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://api.merch.ccstiet.com",
     "http://localhost:3000",
     "http://localhost:3377",
+    "https://af99-2405-201-4013-f128-74e4-b4d8-e225-704d.ngrok-free.app"
 ]
 
 PAYU_MERCHANT_KEY = os.getenv("PAYU_MERCHANT_KEY")

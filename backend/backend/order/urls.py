@@ -11,5 +11,5 @@ urlpatterns = [
     # path("payment/success/", PaymentSuccessView.as_view(), name="payment_success"),
     # path("payment/failure/", PaymentFailureView.as_view(), name="payment_failure"),
     path("payment/callback/", PhonePeCallbackView.as_view(), name="phonepe_callback"),
-    path("payment/verify/", PaymentVerifyView.as_view(), name="payment_verfiy"),
+    #path("payment/verify/", PaymentVerifyView.as_view(), name="payment_verfiy"),
 ]

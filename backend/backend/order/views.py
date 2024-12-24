@@ -226,7 +226,9 @@ class PaymentView(APIView):
 
         unique_transaction_id = str(order.id) + str(int(time.time() * 1000))
         ui_redirect_url = "http://localhost:3000/payment-status/"
-        s2s_callback_url = "http://localhost:3377/payment/callback/"
+        #s2s_callback_url = "https://af99-2405-201-4013-f128-74e4-b4d8-e225-704d.ngrok-free.app/payment/callback/"  # Use HTTPS
+        s2s_callback_url = "https://webhook.site/4708a02c-1f73-4cef-999c-d573fb52b73b"  # Use HTTPS
+        
         amount = int(order.updated_amount * 100)
         id_assigned_to_user_by_merchant = user.id
 
@@ -237,7 +239,7 @@ class PaymentView(APIView):
             "amount": amount,
             "redirectUrl": ui_redirect_url,
             "redirectMode": "REDIRECT",
-            "callbackUrl": s2s_callback_url,
+            "callbackUrl": s2s_callback_url,  # Ensure correct case
             "paymentInstrument": {
                 "type": "PAY_PAGE"
             }
@@ -293,8 +295,7 @@ class PaymentView(APIView):
         return Response(
             {"detail": "Payment initiation failed."},
             status=status.HTTP_400_BAD_REQUEST
-        )
-            
+        )            
 
 # class PaymentSuccessView(APIView):
 #     permission_classes = [AllowAny]
@@ -389,29 +390,29 @@ class PaymentView(APIView):
 #             )
 
 
-class PaymentVerifyView(APIView):
-    permission_classes = [IsAuthenticated]
+# class PaymentVerifyView(APIView):
+#     permission_classes = [IsAuthenticated]
 
-    def post(self, request):
-        txnid = request.data.get("txnid")
-        user = request.user
+#     def post(self, request):
+#         txnid = request.data.get("txnid")
+#         user = request.user
 
-        try:
-            payment = Payment.objects.get(transaction_id=txnid)
-            if payment.order.user == user:
-                serializer = PaymentSerializer(payment)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            else:
-                return Response(
-                    {"detail": "You do not have permission to view this payment."},
-                    status=status.HTTP_403_FORBIDDEN,
-                )
+#         try:
+#             payment = Payment.objects.get(transaction_id=txnid)
+#             if payment.order.user == user:
+#                 serializer = PaymentSerializer(payment)
+#                 return Response(serializer.data, status=status.HTTP_200_OK)
+#             else:
+#                 return Response(
+#                     {"detail": "You do not have permission to view this payment."},
+#                     status=status.HTTP_403_FORBIDDEN,
+#                 )
 
-        except Payment.DoesNotExist:
-            return Response(
-                {"detail": "Payment record not found."},
-                status=status.HTTP_404_NOT_FOUND,
-            )
+#         except Payment.DoesNotExist:
+#             return Response(
+#                 {"detail": "Payment record not found."},
+#                 status=status.HTTP_404_NOT_FOUND,
+#             )
             
 
 class PhonePeCallbackView(APIView):
