@@ -13,7 +13,7 @@ const Home = ({ user }) => {
     useEffect(() => {
         api.get('/product/all')
             .then(response => {
-                setProducts(response); // Assuming response.data contains the array of products
+                setProducts(response);
             }).finally(() => {
                 setLoading(false);
             });

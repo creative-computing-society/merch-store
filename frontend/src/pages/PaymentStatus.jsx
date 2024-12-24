@@ -16,24 +16,17 @@ const PaymentStatus = () => {
     const [isModalVisible, setIsModalVisible] = useState(false);
 
     useEffect(() => {
-
-        api.post('/payment/webhook/' + txnid + "/", {}, false)
+        api.post('/payment/verify/', { txnid: txnid })
             .then(response => {
-                api.post('/payment/verify/', { txnid: txnid })
-                    .then(response => {
-                        setPaymentDetails(response);
-                        if (response.status !== 'success') {
-                            setValid(true);
-                        }
-                    }).catch(error => {
-                        setPaymentDetails({ error: error.message });
-                    }).finally(() => {
-                        setLoading(false);
-                    });
+                setPaymentDetails(response);
+                if (response.status !== 'success') {
+                    setValid(true);
+                }
+            }).catch(error => {
+                setPaymentDetails({ error: error.message });
+            }).finally(() => {
+                setLoading(false);
             });
-
-
-
     }, [txnid]);
 
     useEffect(() => {
