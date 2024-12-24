@@ -1,8 +1,5 @@
 import hashlib
 import time
-import json
-import base64
-import requests
 from rest_framework.views import APIView
 from django.shortcuts import redirect
 from rest_framework.response import Response
@@ -10,8 +7,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.conf import settings
 from django.db import transaction
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
+
 from .models import Order, OrderItem, Payment
 from .serializers import OrderSerializer, PaymentSerializer
 from .utils import generate_qr_code
@@ -23,23 +19,49 @@ from datetime import datetime, timedelta
 import pytz
 import random
 
+from phonepe.sdk.pg.payments.v1.payment_client import PhonePePaymentClient
+from phonepe.sdk.pg.env import Env
+from phonepe.sdk.pg.payments.v1.models.request.pg_pay_request import PgPayRequest
+
+
 # Test keys
-merchant_id = "PGTESTPAYUAT"
-salt_key = "099eb0cd-02cf-4e2a-8aca-3e6c6aff0399"
+merchant_id = "PGTESTPAYUAT86"
+salt_key = "96434309-7796-489d-8924-ab56988a6076"
 salt_index = 1
-env = "UAT"  # Change to "PROD" when you go live
+env = Env.UAT  # Change to Env.PROD when you go live
 
-# Base URLs for PhonePe API
-BASE_URLS = {
-    "UAT": "https://api-preprod.phonepe.com/apis/pg-sandbox",
-    "PROD": "https://api.phonepe.com/apis/hermes"
-}
+phonepe_client = PhonePePaymentClient(
+    merchant_id=merchant_id, salt_key=salt_key, salt_index=salt_index, env=env
+)
 
-def generate_phonepe_signature(payload, salt_key, endpoint):
-    data = json.dumps(payload)
-    base64_data = base64.b64encode(data.encode('utf-8')).decode('utf-8')
-    signature_string = base64_data + endpoint + salt_key
-    return hashlib.sha256(signature_string.encode('utf-8')).hexdigest()
+def generateHash(params, salt):
+    hashString = (
+        params["key"]
+        + "|"
+        + params["txnid"]
+        + "|"
+        + params["amount"]
+        + "|"
+        + params["productinfo"]
+        + "|"
+        + params["firstname"]
+        + "|"
+        + params["email"]
+        + "|"
+        + params.get("udf1", "")
+        + "|"
+        + params.get("udf2", "")
+        + "|"
+        + params.get("udf3", "")
+        + "|"
+        + params.get("udf4", "")
+        + "|"
+        + params.get("udf5", "")
+        + "||||||"
+        + salt
+    )
+    return hashlib.sha512(hashString.encode("utf-8")).hexdigest().lower()
+
 
 class AllOrders(APIView):
     permission_classes = [IsAuthenticated]
@@ -226,149 +248,129 @@ class PaymentView(APIView):
 
         unique_transaction_id = str(order.id) + str(int(time.time() * 1000))
         ui_redirect_url = "http://localhost:3000/payment-status/"
-        s2s_callback_url = "http://localhost:8000/payment/callback/"
+        s2s_callback_url = "http://localhost:8000/payment/verify/"
         amount = int(order.updated_amount * 100)
         id_assigned_to_user_by_merchant = user.id
 
-        payload = {
-            "merchantId": merchant_id,
-            "merchantTransactionId": unique_transaction_id,
-            "merchantUserId": id_assigned_to_user_by_merchant,
-            "amount": amount,
-            "redirectUrl": ui_redirect_url,
-            "redirectMode": "REDIRECT",
-            "callbackUrl": s2s_callback_url,
-            "paymentInstrument": {
-                "type": "PAY_PAGE"
-            }
-        }
-
-        endpoint = "/pg/v1/pay"
-        signature = generate_phonepe_signature(payload, salt_key, endpoint)
-        headers = {
-            "Content-Type": "application/json",
-            "X-VERIFY": f"{signature}###{salt_index}"
-        }
-
-        base_url = BASE_URLS[env]
-        response = requests.post(
-            f"{base_url}{endpoint}",
-            json=payload,
-            headers=headers
+        pay_page_request = PgPayRequest.pay_page_pay_request_builder(
+            merchant_transaction_id=unique_transaction_id,
+            amount=amount,
+            merchant_user_id=id_assigned_to_user_by_merchant,
+            callback_url=s2s_callback_url,
+            redirect_url=ui_redirect_url,
         )
+        pay_page_response = phonepe_client.pay(pay_page_request)
 
-        # Log the payload and response for debugging
-        print("Payload:", payload)
-        print("Response Status Code:", response.status_code)
-        print("Response Content:", response.content)
+        pay_page_url = pay_page_response.data.instrument_response.redirect_info.url
+        Payment.objects.create(
+            order=order,
+            transaction_id=unique_transaction_id,
+            paid_amount=order.updated_amount,
+            status="pending",
+        )
+        # Assuming you have the x_verify and response data from the callback
+        x_verify = request.headers.get('x-verify')
+        response_data = request.body.decode('utf-8')
+        phonepe_client.verify_response(x_verify=x_verify, response=response_data)
+        return Response({"pay_page_url": pay_page_url}, status=status.HTTP_200_OK)
 
-        if response.status_code == 200:
-            return Response(response.json(), status=status.HTTP_200_OK)
-        else:
+
+class PaymentSuccessView(APIView):
+    permission_classes = [AllowAny]
+    authentication_classes = [AllowAny]
+
+    def post(self, request):
+        txnid = request.data.get("txnid")
+        status = request.data.get("status")
+        payment_id = request.data.get("mihpayid")
+        reason = request.data.get("field9")
+
+        try:
+            payment = Payment.objects.get(transaction_id=txnid)
+            payment.status = status
+            payment.payment_id = payment_id
+            payment.reason = reason
+            payment.save()
+
+            if status == "success":
+                payment.order.is_verified = True
+                payment.order.save()
+
+                # Increment the discount code uses if present
+                if payment.order.discount_code:
+                    payment.order.discount_code.uses += 1
+                    payment.order.discount_code.save()
+
+                # Remove items from the cart
+                CartItem.objects.filter(user=payment.order.user).delete()
+
+                order_items = OrderItem.objects.filter(order=payment.order).all()
+                prod_list = []
+                for item in order_items:
+                    prod_list.append(
+                        {
+                            "name": item.product.name,
+                            "quantity": item.quantity,
+                        }
+                    )
+
+                # Generate and save QR code
+                qr_data = generate_qr_code(payment.order)
+
+                send_order_success_email_async(
+                    payment.transaction_id,
+                    payment.order.updated_amount,
+                    prod_list,
+                    payment.order.user.name,
+                    qr_data,
+                    payment.order.user.email,
+                )
+
+                redirect_url = f"http://localhost:3000/payment-status/{txnid}"
+                # redirect_url = f"https://merch.ccstiet.com/payment-status/{txnid}"
+                return redirect(redirect_url)
+
+        except Payment.DoesNotExist:
             return Response(
-                {"detail": "Payment initiation failed."},
-                status=status.HTTP_400_BAD_REQUEST
+                {"detail": "Payment record not found."},
+                status=status.HTTP_404_NOT_FOUND,
             )
-            
-            
-
-# class PaymentSuccessView(APIView):
-#     permission_classes = [AllowAny]
-#     authentication_classes = [AllowAny]
-
-#     def post(self, request):
-#         txnid = request.data.get("txnid")
-#         status = request.data.get("status")
-#         payment_id = request.data.get("mihpayid")
-#         reason = request.data.get("field9")
-
-#         try:
-#             payment = Payment.objects.get(transaction_id=txnid)
-#             payment.status = status
-#             payment.payment_id = payment_id
-#             payment.reason = reason
-#             payment.save()
-
-#             if status == "success":
-#                 payment.order.is_verified = True
-#                 payment.order.save()
-
-#                 # Increment the discount code uses if present
-#                 if payment.order.discount_code:
-#                     payment.order.discount_code.uses += 1
-#                     payment.order.discount_code.save()
-
-#                 # Remove items from the cart
-#                 CartItem.objects.filter(user=payment.order.user).delete()
-
-#                 order_items = OrderItem.objects.filter(order=payment.order).all()
-#                 prod_list = []
-#                 for item in order_items:
-#                     prod_list.append(
-#                         {
-#                             "name": item.product.name,
-#                             "quantity": item.quantity,
-#                         }
-#                     )
-
-#                 # Generate and save QR code
-#                 qr_data = generate_qr_code(payment.order)
-
-#                 send_order_success_email_async(
-#                     payment.transaction_id,
-#                     payment.order.updated_amount,
-#                     prod_list,
-#                     payment.order.user.name,
-#                     qr_data,
-#                     payment.order.user.email,
-#                 )
-
-#                 redirect_url = f"http://localhost:3000/payment-status/{txnid}"
-#                 # redirect_url = f"https://merch.ccstiet.com/payment-status/{txnid}"
-#                 return redirect(redirect_url)
-
-#         except Payment.DoesNotExist:
-#             return Response(
-#                 {"detail": "Payment record not found."},
-#                 status=status.HTTP_404_NOT_FOUND,
-#             )
 
 
-# class PaymentFailureView(APIView):
-#     permission_classes = [AllowAny]
-#     authentication_classes = [AllowAny]
+class PaymentFailureView(APIView):
 
-#     def post(self, request):
-#         txnid = request.data.get("txnid")
-#         status = request.data.get("status")
-#         payment_id = request.data.get("mihpayid")
-#         reason = request.data.get("field9")
+    def post(self, request):
+        txnid = request.data.get("txnid")
+        status = request.data.get("status")
+        payment_id = request.data.get("mihpayid")
+        reason = request.data.get("field9")
 
-#         try:
-#             payment = Payment.objects.get(transaction_id=txnid)
-#             payment.status = status
-#             payment.payment_id = payment_id
-#             payment.reason = reason
-#             payment.save()
+        try:
+            payment = Payment.objects.get(transaction_id=txnid)
+            payment.status = status
+            payment.payment_id = payment_id
+            payment.reason = reason
+            payment.save()
 
-#             if status == "failure":
-#                 payment.order.is_verified = False
-#                 payment.order.save()
-#                 redirect_url = f"http://localhost:3000/payment-status/{txnid}"
-#                 # redirect_url = f"https://merch.ccstiet.com/payment-status/{txnid}"
-#                 return redirect(redirect_url)
+            if status == "failure":
+                payment.order.is_verified = False
+                payment.order.save()
+                redirect_url = f"http://localhost:3000/payment-status/{txnid}"
+                # redirect_url = f"https://merch.ccstiet.com/payment-status/{txnid}"
+                return redirect(redirect_url)
 
-#         except Payment.DoesNotExist:
-#             return Response(
-#                 {"detail": "Payment record not found."},
-#                 status=status.HTTP_404_NOT_FOUND,
-#             )
+        except Payment.DoesNotExist:
+            return Response(
+                {"detail": "Payment record not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
 
 class PaymentVerifyView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+        print(request.body)
         txnid = request.data.get("txnid")
         user = request.user
 
@@ -388,53 +390,3 @@ class PaymentVerifyView(APIView):
                 {"detail": "Payment record not found."},
                 status=status.HTTP_404_NOT_FOUND,
             )
-            
-
-class PhonePeCallbackView(APIView):
-    permission_classes = [AllowAny]
-    authentication_classes = [AllowAny]
-
-    @method_decorator(csrf_exempt)
-    def post(self, request):
-        try:
-            base64_response = request.data.get("response")
-            x_verify = request.headers.get("X-VERIFY")
-
-            # Decode the base64 response
-            decoded_response = base64.b64decode(base64_response).decode('utf-8')
-            response_data = json.loads(decoded_response)
-
-            # Validate the checksum
-            calculated_checksum = hashlib.sha256((base64_response + salt_key).encode('utf-8')).hexdigest()
-            expected_x_verify = f"{calculated_checksum}###{salt_index}"
-            if x_verify != expected_x_verify:
-                return Response({"detail": "Invalid checksum."}, status=status.HTTP_400_BAD_REQUEST)
-
-            # Extract payment details
-            data = response_data.get("data")
-            merchant_transaction_id = data.get("merchantTransactionId")
-            status = data.get("state")
-            transaction_id = data.get("transactionId")
-            amount = data.get("amount")
-
-            # Update payment record
-            try:
-                payment = Payment.objects.get(transaction_id=merchant_transaction_id)
-                payment.payment_id = transaction_id
-                payment.paid_amount = amount
-                payment.status = status
-                payment.save()
-
-                if status == "COMPLETED":
-                    payment.order.is_verified = True
-                else:
-                    payment.order.is_verified = False
-                payment.order.save()
-
-                return Response({"detail": "Payment record updated successfully."}, status=status.HTTP_200_OK)
-
-            except Payment.DoesNotExist:
-                return Response({"detail": "Payment record not found."}, status=status.HTTP_404_NOT_FOUND)
-
-        except Exception as e:
-            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)

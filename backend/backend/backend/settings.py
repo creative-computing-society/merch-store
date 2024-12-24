@@ -167,10 +167,10 @@ CSRF_TRUSTED_ORIGINS = [
 
 PAYU_MERCHANT_KEY = os.getenv("PAYU_MERCHANT_KEY")
 PAYU_MERCHANT_SALT = os.getenv("PAYU_MERCHANT_SALT")
-# PAYU_SUCCESS_URL = "https://api.merch.ccstiet.com/payment/success/"
-PAYU_SUCCESS_URL = "http://192.168.1.39:8000/payment/success/"
-# PAYU_FAILURE_URL = "https://api.merch.ccstiet.com/payment/failure/"
-PAYU_FAILURE_URL = "http://192.168.1.39:8000/payment/failure/"
+#PAYU_SUCCESS_URL = "https://api.merch.ccstiet.com/payment/success/"
+PAYU_SUCCESS_URL = "http://localhost:3000/payment/success/"
+#PAYU_FAILURE_URL = "https://api.merch.ccstiet.com/payment/failure/"
+PAYU_FAILURE_URL = "http://localhost:3000/payment/failure/"
 
 # gmail_send/settings.py
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"

@@ -8,7 +8,8 @@ urlpatterns = [
     path("order/place/", Checkout.as_view(), name="place_order"),
     path("order/apply-discount/", ApplyDiscount.as_view(), name="apply_discount"),
     path("payment/<str:order_id>/", PaymentView.as_view(), name="payment_checkout"),
-    path("payment/success/", PaymentSuccessView.as_view(), name="payment_success"),
-    path("payment/failure/", PaymentFailureView.as_view(), name="payment_failure"),
+    # path("payment/success/", PaymentSuccessView.as_view(), name="payment_success"),
+    # path("payment/failure/", PaymentFailureView.as_view(), name="payment_failure"),
+    path("payment/callback/", PhonePeCallbackView.as_view(), name="phonepe_callback"),
     path("payment/verify/", PaymentVerifyView.as_view(), name="payment_verfiy"),
 ]
