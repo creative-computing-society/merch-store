@@ -13,6 +13,8 @@ backend/static
 backend/media
 backend/logs
 
+migrations
+
 #vs code files
 *.vscode
 __pycache__

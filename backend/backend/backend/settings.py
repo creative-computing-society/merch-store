@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = os.getenv("DEBUG")
-ALLOWED_HOSTS = ["api.merch.ccstiet.com", "127.0.0.1", "localhost"]
+ALLOWED_HOSTS = ["api.merch.ccstiet.com", "127.0.0.1", "localhost", "192.168.1.26"]
 
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 
@@ -98,13 +98,13 @@ AUTH_USER_MODEL = "login.CustomUser"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('POSTGRES_DB'),
-        'USER': os.getenv('POSTGRES_USER'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
-        'HOST': os.getenv('DATABASE_HOST'),
-        'PORT': os.getenv('DATABASE_PORT'),
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.getenv("POSTGRES_DB"),
+        "USER": os.getenv("POSTGRES_USER"),
+        "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
+        "HOST": os.getenv("DATABASE_HOST"),
+        "PORT": os.getenv("DATABASE_PORT"),
     }
 }
 
@@ -153,14 +153,24 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-CORS_ALLOWED_ORIGINS = ["https://merch.ccstiet.com","https://api.merch.ccstiet.com","http://localhost:3000"]
+CORS_ALLOWED_ORIGINS = [
+    "https://merch.ccstiet.com",
+    "https://api.merch.ccstiet.com",
+    "http://localhost:3000",
+]
 CORS_ALLOW_HEADERS = ["*"]
-CSRF_TRUSTED_ORIGINS = ["https://merch.ccstiet.com", "https://api.merch.ccstiet.com", "http://localhost:3000"]
+CSRF_TRUSTED_ORIGINS = [
+    "https://merch.ccstiet.com",
+    "https://api.merch.ccstiet.com",
+    "http://localhost:3000",
+]
 
 PAYU_MERCHANT_KEY = os.getenv("PAYU_MERCHANT_KEY")
 PAYU_MERCHANT_SALT = os.getenv("PAYU_MERCHANT_SALT")
-PAYU_SUCCESS_URL = "https://api.merch.ccstiet.com/payment/success/"
-PAYU_FAILURE_URL = "https://api.merch.ccstiet.com/payment/failure/"
+# PAYU_SUCCESS_URL = "https://api.merch.ccstiet.com/payment/success/"
+PAYU_SUCCESS_URL = "http://192.168.1.26:8000/payment/success/"
+# PAYU_FAILURE_URL = "https://api.merch.ccstiet.com/payment/failure/"
+PAYU_FAILURE_URL = "http://192.168.1.26:8000/payment/failure/"
 
 # gmail_send/settings.py
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
@@ -204,6 +214,3 @@ LOGGING = {
         },
     },
 }
-
-CASHFREE_CLIENT_ID = os.getenv("CASHFREE_CLIENT_ID")
-CASHFREE_CLIENT_SECRET = os.getenv("CASHFREE_CLIENT_SECRET")
