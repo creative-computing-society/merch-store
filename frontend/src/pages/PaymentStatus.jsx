@@ -15,30 +15,30 @@ const PaymentStatus = () => {
     const [valid, setValid] = useState(false);
     const [isModalVisible, setIsModalVisible] = useState(false);
 
-    useEffect(() => {
-        api.post('/payment/verify/', { txnid: txnid })
-            .then(response => {
-                setPaymentDetails(response);
-                if (response.status !== 'success') {
-                    setValid(true);
-                }
-            }).catch(error => {
-                setPaymentDetails({ error: error.message });
-            }).finally(() => {
-                setLoading(false);
-            });
-    }, [txnid]);
+    // useEffect(() => {
+    //     api.post('/payment/verify/', { txnid: txnid })
+    //         .then(response => {
+    //             setPaymentDetails(response);
+    //             if (response.status !== 'success') {
+    //                 setValid(true);
+    //             }
+    //         }).catch(error => {
+    //             setPaymentDetails({ error: error.message });
+    //         }).finally(() => {
+    //             setLoading(false);
+    //         });
+    // }, [txnid]);
 
-    useEffect(() => {
-        if (!valid) return;
-        if (count === 0) {
-            navigate('/');
-        }
-        const timeout = setTimeout(() => {
-            setCount(count - 1);
-        }, 1000);
-        return () => clearTimeout(timeout);
-    }, [count, navigate, valid]);
+    // useEffect(() => {
+    //     if (!valid) return;
+    //     if (count === 0) {
+    //         navigate('/');
+    //     }
+    //     const timeout = setTimeout(() => {
+    //         setCount(count - 1);
+    //     }, 1000);
+    //     return () => clearTimeout(timeout);
+    // }, [count, navigate, valid]);
     return (<>
         <div className='flex gap-8 rounded-lg items-center w-full md:h-[calc(100vh-10rem)] justify-center'>
             <div className='flex flex-col rounded-lg p-8 shadow-lg border-2 h-full w-full bg-container justify-center items-center md:p-16'>

@@ -15,14 +15,22 @@ from discounts.models import DiscountCode
 from products.models import CartItem
 
 from .tasks import send_order_success_email_async
-
-from cashfree_pg.models.create_order_request import CreateOrderRequest
-from cashfree_pg.api_client import Cashfree
-from cashfree_pg.models.customer_details import CustomerDetails
-from cashfree_pg.models.order_meta import OrderMeta
 from datetime import datetime, timedelta
 import pytz
 import random
+
+from phonepe.sdk.pg.payments.v1.payment_client import PhonePePaymentClient
+from phonepe.sdk.pg.env import Env
+from phonepe.sdk.pg.payments.v1.models.request.pg_pay_request import PgPayRequest
+
+merchant_id = "PGTESTPAYUAT86"
+salt_key = "96434309-7796-489d-8924-ab56988a6076"
+salt_index = 1
+env = Env.UAT  # Change to Env.PROD when you go live
+
+phonepe_client = PhonePePaymentClient(
+    merchant_id=merchant_id, salt_key=salt_key, salt_index=salt_index, env=env
+)
 
 
 def generateHash(params, salt):
@@ -237,45 +245,30 @@ class PaymentView(APIView):
                 {"detail": "Order not found."}, status=status.HTTP_404_NOT_FOUND
             )
 
-        key = settings.PAYU_MERCHANT_KEY
-        salt = settings.PAYU_MERCHANT_SALT
-        txnid = str(order.id) + str(int(time.time() * 1000))
-        amount = "{:.2f}".format(float(order.updated_amount))
-        productinfo = "Order_" + str(order.id)
-        firstname = str(user.name.split()[0] if " " in user.name else user.name)
-        email = str(user.email)
-        phone = str(user.phone_no)
-        surl = settings.PAYU_SUCCESS_URL
-        furl = settings.PAYU_FAILURE_URL
+        unique_transaction_id = str(order.id) + str(int(time.time() * 1000))
+        ui_redirect_url = "http://localhost:3000/payment-status/"
+        s2s_callback_url = "http://localhost:8000/payment/verify/"
+        amount = int(order.updated_amount * 100)
+        id_assigned_to_user_by_merchant = user.id
 
-        payload = {
-            "key": key,
-            "txnid": txnid,
-            "amount": amount,
-            "firstname": firstname,
-            "email": email,
-            "phone": phone,
-            "productinfo": productinfo,
-            "surl": surl,
-            "furl": furl,
-            "udf1": "",
-            "udf2": "",
-            "udf3": "",
-            "udf4": "",
-            "udf5": "",
-        }
+        pay_page_request = PgPayRequest.pay_page_pay_request_builder(
+            merchant_transaction_id=unique_transaction_id,
+            amount=amount,
+            merchant_user_id=id_assigned_to_user_by_merchant,
+            callback_url=s2s_callback_url,
+            redirect_url=ui_redirect_url,
+        )
+        pay_page_response = phonepe_client.pay(pay_page_request)
 
-        hashValue = generateHash(payload, salt)
-        payload["hash"] = hashValue
-
+        pay_page_url = pay_page_response.data.instrument_response.redirect_info.url
         Payment.objects.create(
             order=order,
-            transaction_id=txnid,
+            transaction_id=unique_transaction_id,
             paid_amount=order.updated_amount,
             status="pending",
         )
-
-        return Response(payload, status=status.HTTP_200_OK)
+        phonepe_client.verify_response()
+        return Response({"pay_page_url": pay_page_url}, status=status.HTTP_200_OK)
 
 
 class PaymentSuccessView(APIView):
@@ -373,6 +366,7 @@ class PaymentVerifyView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+        print(request.body)
         txnid = request.data.get("txnid")
         user = request.user
 

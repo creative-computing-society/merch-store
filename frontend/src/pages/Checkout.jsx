@@ -5,12 +5,10 @@ import { faGift, faMoneyBill, faRemove } from '@fortawesome/free-solid-svg-icons
 import { Link, redirect } from 'react-router-dom';
 import api_url from '../helpers/Config';
 import confirmPopup from '../components/ConfirmPopup';
-
-
-
-
+import { useNavigate } from 'react-router-dom';
 
 const Checkout = () => {
+    const navigate = useNavigate();
     const [cartProducts, setCartProducts] = useState([]);
     const [cartAmt, setCartAmt] = useState({});
 
@@ -18,7 +16,7 @@ const Checkout = () => {
     const [codeApplied, setCodeApplied] = useState(false);
     const [codeError, setCodeError] = useState(false);
 
-    const [paymentPayload, setPaymentPayload] = useState({});
+    const [paymentPayload, setPaymentPayload] = useState(null);
     const [loading, setLoading] = useState(true);
     const [disabled, setDisabled] = useState(false);
 
@@ -84,7 +82,7 @@ const Checkout = () => {
         api.post('/order/place/', body)
             .then(response => {
                 api.post(`/payment/${response.order.id}/`).then(response => {
-                    setPaymentPayload(response);
+                    window.location.href = response.pay_page_url;
                     setLoading(false);
                 });
             }).catch(error => {
@@ -119,27 +117,7 @@ const Checkout = () => {
 
                     <Button disabled={codeApplied} onClick={applyDiscount} icon={faGift} className='px-4 py-2 mt-4 w-full' text='Apply Discount' />
                 </div>
-                <form action='https://test.payu.in/_payment' method='post' onSubmit={handlePayment} id="paymentForm">
-                    <input type="hidden" name="key" value={paymentPayload.key} />
-                    <input type="hidden" name="txnid" value={paymentPayload.txnid} />
-                    <input type="hidden" name="amount" value={paymentPayload.amount} />
-                    <input type="hidden" name="firstname" value={paymentPayload.firstname} />
-                    <input type="hidden" name="email" value={paymentPayload.email} />
-                    <input type="hidden" name="phone" value={paymentPayload.phone} />
-                    <input type="hidden" name="productinfo" value={paymentPayload.productinfo} />
-                    {/* <input type="hidden" name="lastname" value={paymentPayload.lastName}  /> */}
-                    <input type="hidden" name="surl" value={paymentPayload.surl} />
-                    <input type="hidden" name="furl" value={paymentPayload.furl} />
-                    <input type="hidden" name="udf1" value={paymentPayload.udf1} />
-                    <input type="hidden" name="udf2" value={paymentPayload.udf2} />
-                    <input type="hidden" name="udf3" value={paymentPayload.udf3} />
-                    <input type="hidden" name="udf4" value={paymentPayload.udf4} />
-                    <input type="hidden" name="udf5" value={paymentPayload.udf5} />
-                    <input type="hidden" name="enforce_paymethod" value="upi" />
-                    <input type="hidden" name="hash" value={paymentPayload.hash} />
-                    <Button type="submit" disabled={disabled} className='px-4 py-2 mt-4 w-full' icon={faMoneyBill} isActive text="Pay Now" />
 
-                </form>
                 <div className='mt-auto'>
                     <hr className='border-t-2 my-4 border-gray-200 rounded-lg' />
                     <div>

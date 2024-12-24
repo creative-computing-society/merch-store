@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = os.getenv("DEBUG")
-ALLOWED_HOSTS = ["api.merch.ccstiet.com", "127.0.0.1", "localhost", "192.168.1.26"]
+ALLOWED_HOSTS = ["api.merch.ccstiet.com", "127.0.0.1", "localhost", "192.168.1.39"]
 
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 
@@ -168,9 +168,9 @@ CSRF_TRUSTED_ORIGINS = [
 PAYU_MERCHANT_KEY = os.getenv("PAYU_MERCHANT_KEY")
 PAYU_MERCHANT_SALT = os.getenv("PAYU_MERCHANT_SALT")
 # PAYU_SUCCESS_URL = "https://api.merch.ccstiet.com/payment/success/"
-PAYU_SUCCESS_URL = "http://192.168.1.26:8000/payment/success/"
+PAYU_SUCCESS_URL = "http://192.168.1.39:8000/payment/success/"
 # PAYU_FAILURE_URL = "https://api.merch.ccstiet.com/payment/failure/"
-PAYU_FAILURE_URL = "http://192.168.1.26:8000/payment/failure/"
+PAYU_FAILURE_URL = "http://192.168.1.39:8000/payment/failure/"
 
 # gmail_send/settings.py
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
