@@ -63,9 +63,6 @@ class AddToCart(APIView):
             not product
             or user_position not in product.for_user_positions
             or CartItem.objects.filter(user=user, product=product).exists()
-            or OrderItem.objects.filter(product=product, order__user=user)
-            .exclude(order__is_verified=False)
-            .exists()
             or not product.is_visible
             or not product.accept_orders
         ):
