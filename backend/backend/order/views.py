@@ -342,11 +342,12 @@ class PaymentVerifyView(APIView):
             return Response(
                 {"detail": "Invalid payload."}, status=status.HTTP_400_BAD_REQUEST
             )
-        merchant_transaction_id = payload.get("merchantTransactionId")
+        data = payload.get("data")
+        merchant_transaction_id = data.get("merchantTransactionId")
         payment = Payment.objects.get(transaction_id=merchant_transaction_id)
         payment.status = payload.get("code")
-        payment.payment_id = payload.get("transactionId")
-        payment.reason = payload.get("state")
+        payment.payment_id = data.get("transactionId")
+        payment.reason = data.get("state")
         payment.save()
 
         if payload.get("code") == "PAYMENT_SUCCESS":
