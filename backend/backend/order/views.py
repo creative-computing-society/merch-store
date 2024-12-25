@@ -358,7 +358,7 @@ class PaymentVerifyView(APIView):
             headers=headers,
         )
 
-        if response.status_code != 200:
+        if response.json().get("success") != True:
             return Response(
                 {"detail": "Payment verification failed."},
                 status=status.HTTP_400_BAD_REQUEST,
@@ -412,9 +412,7 @@ class PaymentVerifyView(APIView):
         else:
             payment.order.is_verified = False
             payment.order.save()
-            return Response(
-                {"detail": "Payment failed."}, status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({"detail": resp_data}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PaymentResultView(APIView):
