@@ -25,10 +25,12 @@ import pytz
 import random
 
 # Test keys
-merchant_id = settings.PHONEPE_MERCHANT_ID
-salt_key = settings.PHONEPE_SALT_KEY
+# merchant_id = settings.PHONEPE_MERCHANT_ID
+# salt_key = settings.PHONEPE_SALT_KEY
+merchant_id = "PGTESTPAYUAT86"
+salt_key = "96434309-7796-489d-8924-ab56988a6076"
 salt_index = 1
-env = "PROD"  # Change to "PROD" when you go live
+env = "UAT"  # Change to "PROD" when you go live
 
 # Base URLs for PhonePe API
 BASE_URLS = {
@@ -223,7 +225,7 @@ class PaymentView(APIView):
         unique_transaction_id = str(order.id) + str(int(time.time() * 1000))
         # ui_redirect_url = "http://localhost:8000/payment_completed/verify/"
         ui_redirect_url = f"{settings.PHONEPE_RETURN_URL}{unique_transaction_id}/"
-        s2s_callback_url = {settings.PHONEPE_CALLBACK_URL}  # Use HTTPS
+        s2s_callback_url = settings.PHONEPE_CALLBACK_URL  # Use HTTPS
 
         amount = int(order.updated_amount * 100)
         id_assigned_to_user_by_merchant = user.id
