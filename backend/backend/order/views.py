@@ -1,4 +1,5 @@
 import hashlib
+import logging
 import time
 import json
 import base64
@@ -332,6 +333,8 @@ class PaymentView(APIView):
 # Correct code to use with REDIRECT and S2S callback
 class PaymentVerifyView(APIView):
     def post(self, request):
+        logger = logging.getLogger(__name__)
+        logger.error("Payment verification called")
         b64_payload = request.data.get("response")
         payload = json.loads(base64.b64decode(b64_payload).decode("utf-8"))
 
@@ -341,7 +344,7 @@ class PaymentVerifyView(APIView):
             )
         merchant_transaction_id = payload.get("merchantTransactionId")
         payment = Payment.objects.get(transaction_id=merchant_transaction_id)
-        payment.status = "success"
+        payment.status = payload.get("code")
         payment.payment_id = payload.get("transactionId")
         payment.reason = payload.get("state")
         payment.save()
