@@ -26,12 +26,10 @@ import pytz
 import random
 
 # Test keys
-# merchant_id = settings.PHONEPE_MERCHANT_ID
-# salt_key = settings.PHONEPE_SALT_KEY
-merchant_id = "PGTESTPAYUAT86"
-salt_key = "96434309-7796-489d-8924-ab56988a6076"
+merchant_id = settings.PHONEPE_MERCHANT_ID
+salt_key = settings.PHONEPE_SALT_KEY
 salt_index = 1
-env = "UAT"  # Change to "PROD" when you go live
+env = "PROD"  # Change to "PROD" when you go live
 
 # Base URLs for PhonePe API
 BASE_URLS = {
@@ -333,8 +331,6 @@ class PaymentView(APIView):
 # Correct code to use with REDIRECT and S2S callback
 class PaymentVerifyView(APIView):
     def post(self, request):
-        logger = logging.getLogger(__name__)
-        logger.error("Payment verification called")
         b64_payload = request.data.get("response")
         payload = json.loads(base64.b64decode(b64_payload).decode("utf-8"))
 
