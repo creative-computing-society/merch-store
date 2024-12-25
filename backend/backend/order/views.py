@@ -25,27 +25,16 @@ import pytz
 import random
 
 # Test keys
-merchant_id = "PGTESTPAYUAT86"
-salt_key = "96434309-7796-489d-8924-ab56988a6076"
+merchant_id = settings.PHONEPE_MERCHANT_ID
+salt_key = settings.PHONEPE_SALT_KEY
 salt_index = 1
-env = "UAT"  # Change to "PROD" when you go live
+env = "PROD"  # Change to "PROD" when you go live
 
 # Base URLs for PhonePe API
 BASE_URLS = {
     "UAT": "https://api-preprod.phonepe.com/apis/pg-sandbox",
     "PROD": "https://api.phonepe.com/apis/hermes",
 }
-
-CHECK_STATUS_URLS = {
-    "UAT": "https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/status/{merchantId}/{merchantTransactionId}",
-    "PROD": "https://api.phonepe.com/apis/hermes/transaction",
-}
-
-# def generate_phonepe_signature(payload, salt_key, endpoint):
-#     data = json.dumps(payload)
-#     base64_data = base64.b64encode(data.encode('utf-8')).decode('utf-8')
-#     signature_string = base64_data + endpoint + salt_key
-#     return hashlib.sha256(signature_string.encode('utf-8')).hexdigest()
 
 
 class AllOrders(APIView):
@@ -232,11 +221,9 @@ class PaymentView(APIView):
             )
 
         unique_transaction_id = str(order.id) + str(int(time.time() * 1000))
-        ui_redirect_url = "http://localhost:8000/payment_completed/verify/"
-        # s2s_callback_url = "https://af99-2405-201-4013-f128-74e4-b4d8-e225-704d.ngrok-free.app/payment/callback/"  # Use HTTPS
-        s2s_callback_url = (
-            "https://webhook-test.com/b1c68c90f5a5d25053aba8385b17a0d8"  # Use HTTPS
-        )
+        # ui_redirect_url = "http://localhost:8000/payment_completed/verify/"
+        ui_redirect_url = f"{settings.PHONEPE_RETURN_URL}{unique_transaction_id}/"
+        s2s_callback_url = {settings.PHONEPE_CALLBACK_URL}  # Use HTTPS
 
         amount = int(order.updated_amount * 100)
         id_assigned_to_user_by_merchant = user.id
@@ -247,8 +234,8 @@ class PaymentView(APIView):
             "merchantUserId": id_assigned_to_user_by_merchant,
             "amount": amount,
             "redirectUrl": ui_redirect_url,
-            # "redirectMode": "REDIRECT", # Uncomment this line for S2S callback
-            "redirectMode": "POST",
+            "redirectMode": "REDIRECT",  # Uncomment this line for S2S callback
+            # "redirectMode": "POST",
             "callbackUrl": s2s_callback_url,  # Ensure correct case
             "paymentInstrument": {"type": "PAY_PAGE"},
         }
@@ -304,16 +291,60 @@ class PaymentView(APIView):
 
 
 # Working with POST UI CALLBACK, SHUDNT BE USED IN PROD
+# class PaymentVerifyView(APIView):
+#     def post(self, request):
+#         data = request.data
+#         merchant_transaction_id = data.get("transactionId")
+#         payment = Payment.objects.get(transaction_id=merchant_transaction_id)
+#         payment.status = data.get("code")
+#         payment.payment_id = data.get("providerReferenceId")
+#         payment.reason = data.get("code")
+#         payment.save()
+#         if data.get("code") == "PAYMENT_SUCCESS":
+#             payment.order.is_verified = True
+#             generate_qr_code(payment.order)
+#             payment.order.save()
+#             if payment.order.discount_code:
+#                 payment.order.discount_code.uses += 1
+#                 payment.order.discount_code.save()
+
+#             CartItem.objects.filter(user=payment.order.user).delete()
+
+#             order_items = OrderItem.objects.filter(order=payment.order).all()
+#             prod_list = []
+#             for item in order_items:
+#                 prod_list.append(
+#                     {
+#                         "name": item.product.name,
+#                         "quantity": item.quantity,
+#                     }
+#                 )
+#         else:
+#             payment.order.is_verified = False
+#             payment.order.save()
+#         return redirect(
+#             f"http://localhost:3000/payment-status/{payment.transaction_id}"
+#         )
+
+
+# Correct code to use with REDIRECT and S2S callback
 class PaymentVerifyView(APIView):
     def post(self, request):
-        data = request.data
-        merchant_transaction_id = data.get("transactionId")
+        b64_payload = request.data.get("response")
+        payload = json.loads(base64.b64decode(b64_payload).decode("utf-8"))
+
+        if not payload:
+            return Response(
+                {"detail": "Invalid payload."}, status=status.HTTP_400_BAD_REQUEST
+            )
+        merchant_transaction_id = payload.get("merchantTransactionId")
         payment = Payment.objects.get(transaction_id=merchant_transaction_id)
-        payment.status = data.get("code")
-        payment.payment_id = data.get("providerReferenceId")
-        payment.reason = data.get("code")
+        payment.status = "success"
+        payment.payment_id = payload.get("transactionId")
+        payment.reason = payload.get("state")
         payment.save()
-        if data.get("code") == "PAYMENT_SUCCESS":
+
+        if payload.get("code") == "PAYMENT_SUCCESS":
             payment.order.is_verified = True
             payment.order.save()
             if payment.order.discount_code:
@@ -331,69 +362,25 @@ class PaymentVerifyView(APIView):
                         "quantity": item.quantity,
                     }
                 )
+
+            qr_data = generate_qr_code(payment.order)
+            send_order_success_email_async(
+                payment.transaction_id,
+                payment.order.updated_amount,
+                prod_list,
+                payment.order.user.name,
+                qr_data,
+                payment.order.user.email,
+            )
+            return Response(
+                {"detail": "Payment successful."}, status=status.HTTP_200_OK
+            )
         else:
             payment.order.is_verified = False
             payment.order.save()
-        return redirect(
-            f"http://localhost:3000/payment-status/{payment.transaction_id}"
-        )
-
-
-# Correct code to use with REDIRECT and S2S callback
-# class PaymentVerifyView(APIView):
-#     def post(self, request):
-#         b64_payload = request.data.get("response")
-#         payload = json.loads(base64.b64decode(b64_payload).decode("utf-8"))
-
-#         if not payload:
-#             return Response(
-#                 {"detail": "Invalid payload."}, status=status.HTTP_400_BAD_REQUEST
-#             )
-#         merchant_transaction_id = payload.get("merchantTransactionId")
-#         payment = Payment.objects.get(transaction_id=merchant_transaction_id)
-#         payment.status = "success"
-#         payment.payment_id = payload.get("transactionId")
-#         payment.reason = payload.get("state")
-#         payment.save()
-
-#         if payload.get("code") == "PAYMENT_SUCCESS":
-
-#             payment.order.is_verified = True
-#             payment.order.save()
-#             if payment.order.discount_code:
-#                 payment.order.discount_code.uses += 1
-#                 payment.order.discount_code.save()
-
-#             CartItem.objects.filter(user=payment.order.user).delete()
-
-#             order_items = OrderItem.objects.filter(order=payment.order).all()
-#             prod_list = []
-#             for item in order_items:
-#                 prod_list.append(
-#                     {
-#                         "name": item.product.name,
-#                         "quantity": item.quantity,
-#                     }
-#                 )
-
-#             qr_data = generate_qr_code(payment.order)
-#             send_order_success_email_async(
-#                 payment.transaction_id,
-#                 payment.order.updated_amount,
-#                 prod_list,
-#                 payment.order.user.name,
-#                 qr_data,
-#                 payment.order.user.email,
-#             )
-#             return Response(
-#                 {"detail": "Payment successful."}, status=status.HTTP_200_OK
-#             )
-#         else:
-#             payment.order.is_verified = False
-#             payment.order.save()
-#             return Response(
-#                 {"detail": "Payment failed."}, status=status.HTTP_400_BAD_REQUEST
-#             )
+            return Response(
+                {"detail": "Payment failed."}, status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 class PaymentResultView(APIView):
