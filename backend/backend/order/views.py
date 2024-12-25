@@ -357,8 +357,10 @@ class PaymentVerifyView(APIView):
             f"https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/status/{merchant_id}/{merchant_transaction_id}",
             headers=headers,
         )
+        logger = logging.getLogger(__name__)
+        logger.error(response.json())
 
-        if response.json().get("success") != True:
+        if response.status_code != 200:
             return Response(
                 {"detail": "Payment verification failed."},
                 status=status.HTTP_400_BAD_REQUEST,
@@ -412,7 +414,9 @@ class PaymentVerifyView(APIView):
         else:
             payment.order.is_verified = False
             payment.order.save()
-            return Response({"detail": resp_data}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"detail": "Payment failed."}, status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 class PaymentResultView(APIView):
