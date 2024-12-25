@@ -338,15 +338,47 @@ class PaymentVerifyView(APIView):
             return Response(
                 {"detail": "Invalid payload."}, status=status.HTTP_400_BAD_REQUEST
             )
+
         data = payload.get("data")
         merchant_transaction_id = data.get("merchantTransactionId")
+
+        signature_string = (
+            f"/pg/v1/status/{merchant_id}/{merchant_transaction_id}" + salt_key
+        )
+        checksum = hashlib.sha256(signature_string.encode("utf-8")).hexdigest()
+        x_verify = f"{checksum}###{salt_index}"
+
+        headers = {
+            "Content-Type": "application/json",
+            "X-VERIFY": x_verify,
+            "X-MERCHANT-ID": merchant_id,
+        }
+        response = requests.get(
+            f"https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/status/{merchant_id}/{merchant_transaction_id}",
+            headers=headers,
+        )
+
+        if response.status_code != 200:
+            return Response(
+                {"detail": "Payment verification failed."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        resp_data = response.json()
+        data2 = resp_data.get("data")
+        if resp_data.get("code") != "PAYMENT_SUCCESS":
+            return Response(
+                {"detail": "Payment verification failed."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         payment = Payment.objects.get(transaction_id=merchant_transaction_id)
-        payment.status = payload.get("code")
-        payment.payment_id = data.get("transactionId")
-        payment.reason = data.get("state")
+        payment.status = resp_data.get("code")
+        payment.payment_id = data2.get("transactionId")
+        payment.reason = data2.get("state")
         payment.save()
 
-        if payload.get("code") == "PAYMENT_SUCCESS":
+        if resp_data.get("code") == "PAYMENT_SUCCESS":
+
             payment.order.is_verified = True
             payment.order.save()
             if payment.order.discount_code:

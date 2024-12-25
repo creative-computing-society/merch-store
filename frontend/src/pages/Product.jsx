@@ -157,9 +157,13 @@ const Product = () => {
                     if (response.status === 'incart') {
                         setDisabled(true);
                         setButtonText('Already in cart');
-                    } else {
+                    } else if (response.status === 'forbidden') {
                         setDisabled(true);
-                        setButtonText('Out of stock or viewing as guest');
+                        setButtonText('Viewing as Guest');
+                    }
+                    else if (response.status === 'nostock') {
+                        setDisabled(true);
+                        setButtonText('Out of Stock');
                     }
                 }
             });

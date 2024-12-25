@@ -80,7 +80,7 @@ Create a \`.env\` file in the project's root directory (base directory), and add
 
 This project uses CCS Single Sign On (SSO) for user authentication. You would be required to add \`JWT_SECRET_KEY\` to the \`.env\` aswell which would be equal to the application's client secret created on CCS Auth portal.
 
-You would also be required to add \`PAYU_MERCHANT_KEY\` and \`PAYU_MERCHANT_SALT\` for the utilisation of PayU Payment Gateway.
+You would also be required to add \`PHONEPE_MERCHANT_ID\` and \`PHONEPE_SALT_KEY\` for the utilisation of PhonePe Payment Gateway.
 
 At last, you would be required to add the database credentials in the \`.env\` file aswell, which includes the fields \`DATABASE_URL\`, \`POSTGRES_NAME\`,\`POSTGRES_USER\`, \`POSTGRES_PASSWORD\`, \`POSTGRES_HOST\`, and \`POSTGRES_PORT\`.
 
@@ -128,10 +128,9 @@ python manage.py runserver
 -   (⭕) GET /order/\<int:order_id\>/ - Fetches single order details by id
 -   (⭕) POST /order/place/ - Place order for the current cart items
 -   (⭕) POST /order/apply-discount/ - Apply discount code on the order
--   (⭕) POST /payment/\<int:order_id\>/ - Fetch payment details for the order id
--   POST /payment/success/ - Handled by PayU Gateway
--   POST /payment/failure/ - Handled by PayU Gateway
--   (⭕) POST /payment/verify/ - Verifies payment status after successful/failed payment
+-   (⭕) POST /payment/\<str:order_id\>/ - Fetch payment details for the order id
+-   (⭕) POST /payment_completed/result/ - Gives result for successful/failed payment
+-   (⭕) POST /payment_completed/verify/ - Verifies payment status after successful/failed payment. Handled by PhonePe
 
 ### Dashboard
 
@@ -146,7 +145,7 @@ python manage.py runserver
 -   (🔵) POST /products/create/ - Creates a product
 -   (🔵) POST /products/edit/\<int:product_id\>/ - Edits a product with code id
 -   (🔵) POST /products/delete/\<int:product_id\>/ - Deletes a product with code id
--   (🔵) GET /scan_qr/ - Renders Scan QR code page template 
+-   (🔵) GET /scan_qr/ - Renders Scan QR code page template
 -   (🔵) POST /scan_qr/scan/ - Verify details and marked as delivered after successful scan
 -   (🔵) POST /export_csv/\<int:id\>/ - Exports a CSV file for given order item id
 
