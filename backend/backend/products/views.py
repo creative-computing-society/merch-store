@@ -146,6 +146,13 @@ class UpdateCart(APIView):
                 cart_item.save()
                 total_amount += cart_item.product.price * cart_item.quantity
 
+        # Check if the total amount is negative
+        if total_amount < 0:
+            return Response(
+                {"error": "Total amount cannot be negative."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         cart_items = CartItem.objects.filter(user=request.user)
         serializer = CartItemSerializer(cart_items, many=True)
 
