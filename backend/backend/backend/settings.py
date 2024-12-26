@@ -21,7 +21,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = os.getenv("DEBUG")
-ALLOWED_HOSTS = ["api.merch.ccstiet.com", "127.0.0.1", "localhost", "192.168.1.39", "af99-2405-201-4013-f128-74e4-b4d8-e225-704d.ngrok-free.app"]
+ALLOWED_HOSTS = [
+    "api.merch.ccstiet.com",
+    "127.0.0.1",
+    "localhost",
+    "192.168.1.4",
+]
 
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 
@@ -157,24 +162,20 @@ CORS_ALLOWED_ORIGINS = [
     "https://merch.ccstiet.com",
     "https://api.merch.ccstiet.com",
     "http://localhost:3000",
-    "http://localhost:3377",
-    "https://af99-2405-201-4013-f128-74e4-b4d8-e225-704d.ngrok-free.app"
+    "http://localhost:8000",
 ]
 CORS_ALLOW_HEADERS = ["*"]
 CSRF_TRUSTED_ORIGINS = [
     "https://merch.ccstiet.com",
     "https://api.merch.ccstiet.com",
     "http://localhost:3000",
-    "http://localhost:3377",
-    "https://af99-2405-201-4013-f128-74e4-b4d8-e225-704d.ngrok-free.app"
+    "http://localhost:8000",
 ]
 
-PAYU_MERCHANT_KEY = os.getenv("PAYU_MERCHANT_KEY")
-PAYU_MERCHANT_SALT = os.getenv("PAYU_MERCHANT_SALT")
-#PAYU_SUCCESS_URL = "https://api.merch.ccstiet.com/payment/success/"
-PAYU_SUCCESS_URL = "http://localhost:3000/payment/success/"
-#PAYU_FAILURE_URL = "https://api.merch.ccstiet.com/payment/failure/"
-PAYU_FAILURE_URL = "http://localhost:3000/payment/failure/"
+PHONEPE_MERCHANT_ID = os.getenv("PHONEPE_MERCHANT_ID")
+PHONEPE_SALT_KEY = os.getenv("PHONEPE_SALT_KEY")
+PHONEPE_CALLBACK_URL = os.getenv("PHONEPE_CALLBACK_URL")
+PHONEPE_RETURN_URL = os.getenv("PHONEPE_RETURN_URL")
 
 # gmail_send/settings.py
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"

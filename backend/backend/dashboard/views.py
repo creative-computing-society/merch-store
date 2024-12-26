@@ -281,7 +281,7 @@ def scan_qr(request):
 
             if (
                 payment.order == order
-                and payment.status == "success"
+                and payment.status == "PAYMENT_SUCCESS"
                 and order.is_verified
                 and not order.is_completed
             ):

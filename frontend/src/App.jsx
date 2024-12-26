@@ -60,7 +60,7 @@ const App = () => {
           <Route path="*" element={<Navigate to="/" />} />
           <Route path="/authVerify" element={<AuthVerify />} />
           <Route
-            path="/payment-status"
+            path="/payment-status/:txnid"
             element={
               authCtx.isLoggedIn ? <PaymentStatus /> : <Navigate to="/login" />
             }

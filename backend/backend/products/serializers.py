@@ -7,10 +7,12 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def get_status(self, obj):
         user = self.context.get('user')
-        if user is None or user.is_anonymous or not obj.accept_orders:
+        if user is None or user.is_anonymous:
             return "forbidden"
-        if OrderItem.objects.filter(product=obj, order__user=user).exclude(order__is_verified=False).exists():
-            return "ordered"
+        if not obj.accept_orders:
+            return "nostock"
+        # if OrderItem.objects.filter(product=obj, order__user=user).exclude(order__is_verified=False).exists():
+        #     return "ordered"
         if CartItem.objects.filter(product=obj, user=user).exists():
             return "incart"
         return "allowed"

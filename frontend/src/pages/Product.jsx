@@ -157,9 +157,13 @@ const Product = () => {
                     if (response.status === 'incart') {
                         setDisabled(true);
                         setButtonText('Already in cart');
-                    } else {
+                    } else if (response.status === 'forbidden') {
                         setDisabled(true);
-                        setButtonText('Out of stock or viewing as guest');
+                        setButtonText('Viewing as Guest');
+                    }
+                    else if (response.status === 'nostock') {
+                        setDisabled(true);
+                        setButtonText('Out of Stock');
                     }
                 }
             });
@@ -238,13 +242,13 @@ const Product = () => {
                                             </label>
                                             <select id='size' className='rounded-lg border-2 p-2' value={size} onChange={(e) => setSize(e.target.value)}>
                                                 <option>Select Size</option>
-                                                <option value='XS'>Extra Small</option>
+{/*                                                 <option value='XS'>Extra Small</option> */}
                                                 <option value='S'>Small</option>
                                                 <option value='M'>Medium</option>
                                                 <option value='L'>Large</option>
                                                 <option value='XL'>Extra Large</option>
                                                 <option value='XXL'>2x Extra Large</option>
-                                                <option value='XXXL'>3x Extra Large</option>
+{/*                                                 <option value='XXXL'>3x Extra Large</option> */}
                                             </select>
                                         </div>
                                     )}
