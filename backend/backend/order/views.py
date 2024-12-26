@@ -83,6 +83,14 @@ class ApplyDiscount(APIView):
             return Response(
                 {"detail": "No items in cart."}, status=status.HTTP_400_BAD_REQUEST
             )
+        
+        # cehck for quantities of cart items
+        for item in cart_items:
+            if item.quantity <= 0:
+                return Response(
+                    {"detail": f"Invalid quantity for product {item.product.name}."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
         total_amount = sum(item.product.price * item.quantity for item in cart_items)
 
@@ -143,6 +151,14 @@ class Checkout(APIView):
             return Response(
                 {"detail": "No items in cart."}, status=status.HTTP_400_BAD_REQUEST
             )
+        
+        # cehck for quantities of cart items
+        for item in cart_items:
+            if item.quantity <= 0:
+                return Response(
+                    {"detail": f"Invalid quantity for product {item.product.name}."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
         total_amount = sum(item.product.price * item.quantity for item in cart_items)
         updated_amount = total_amount
@@ -207,7 +223,7 @@ class Checkout(APIView):
             },
             status=status.HTTP_201_CREATED,
         )
-
+        
 
 class PaymentView(APIView):
     permission_classes = [IsAuthenticated]
