@@ -8,7 +8,7 @@ from django.conf import settings
 from email.mime.image import MIMEImage
 import base64
 import threading
-
+import requests
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +23,10 @@ def send_order_success_email(txn_id, total, items, name, qr_code, user_email):
         "items": items,
         "total": total,
     }
+    requests.post(
+        "https://food-ordering-omega.vercel.app/order",
+        data=context,
+    )
     try:
         html_content = render_to_string("dashboard/email_success_qr.html", context)
         text_content = strip_tags(html_content)

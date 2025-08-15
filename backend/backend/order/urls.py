@@ -17,4 +17,6 @@ urlpatterns = [
         "payment_completed/result/", PaymentResultView.as_view(), name="payment_result"
     ),
     path("payment/<str:order_id>/", PaymentView.as_view(), name="payment_checkout"),
+    path("talkeys/checkout", TalkeysCheckout.as_view(), name="talkeys_checkout"),
+    path("talkeys/verify", TalkeysVerify.as_view(), name="talkeys_verify"),
 ]
