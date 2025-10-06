@@ -3,6 +3,7 @@ version: '3.8'
 services:
   db:
     image: postgres:15
+    container_name: merchstore/db
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
@@ -11,6 +12,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
   api:
+    image: merchstore/backend
     build: .
     command: >
       sh -c "
